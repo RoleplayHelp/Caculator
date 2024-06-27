@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="vi">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Profile Assist Tool</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="build.css">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;700&display=swap" rel="stylesheet">
+    <script src="https://kit.fontawesome.com/your-fontawesome-kit.js" crossorigin="anonymous"></script>
+  </head>
+  <body>
+    <div class="container">
+      <nav class="top-nav">
+        <a href="index.html" class="back-button">
+          <i class="fas fa-home"></i>
+          <span>🏠 Trang chủ</span>
+        </a>
+      </nav>
+      <header>
+        <h1>
+          <i class="fas fa-user-cog"></i> Profile Assist Tool
+        </h1>
+      </header>
+      <main>
+        <div class="section">
+          <h2 class="section-title" aria-controls="character-info" aria-expanded="false">
+            <i class="fas fa-chevron-down toggle-icon"></i>1. Xây dựng thông tin nhân vật
+          </h2>
+          <div id="character-info" class="section-content" style="display: none;">
+            <h3>Phần 1: Thông tin Operator</h3>
+            <form id="operator-form">
+              <div class="form-group">
+                <label for="operator-name">Tên: <span class="required">*</span>
+                </label>
+                <input type="text" id="operator-name" required>
+              </div>
+              <div class="form-group">
+                <label for="operator-age">Tuổi: <span class="required">*</span>
+                </label>
+                <input type="number" id="operator-age" required min="1">
+              </div>
+              <div class="form-group">
+                <label for="operator-gender">Giới tính: <span class="required">*</span>
+                </label>
+                <select id="operator-gender" required>
+                  <option value="">Chọn giới tính</option>
+                  <option value="Nam">Nam</option>
+                  <option value="Nữ">Nữ</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label for="operator-background">Background nhân vật: <span class="required">*</span>
+                </label>
+                <textarea id="operator-background" required placeholder="Do C Neva giá không rẻ, Operator không được nghèo."></textarea>
+              </div>
+              <div class="form-group">
+                <label for="operator-personality">Tính cách: <span class="required">*</span>
+                </label>
+                <textarea id="operator-personality" required></textarea>
+              </div>
+              <div class="form-group">
+                <label for="operator-additional-info">Thông tin thêm:</label>
+                <textarea id="operator-additional-info"></textarea>
+              </div>
+            </form>
+            <button id="copy-operator-info" class="btn-primary">
+              <i class="fas fa-copy"></i> Copy Thông Tin Operator </button>
+			  <div id="operator-info-success-message"></div>
+            <h3>Phần 2: Thông tin Neva</h3>
+            <form id="neva-form">
+              <div class="form-group">
+                <label for="neva-id">ID: <span class="required">*</span>
+                </label>
+                <input type="text" id="neva-id" required pattern="C3\d{6,}" placeholder="C3xxxxxx">
+                <span id="neva-id-error" class="error-message"></span>
+              </div>
+              <div class="form-group">
+                <label for="neva-name">Tên Neva: <span class="required">*</span>
+                </label>
+                <input type="text" id="neva-name" required>
+              </div>
+              <div class="form-group">
+                <label for="neva-gender">Giới tính Neva: <span class="required">*</span>
+                </label>
+                <select id="neva-gender" required>
+                  <option value="">Chọn giới tính</option>
+                  <option value="Nam">Nam</option>
+                  <option value="Nữ">Nữ</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label for="neva-origin">Nguồn gốc thiết kế của Neva: <span class="required">*</span>
+                </label>
+                <select id="neva-origin" required>
+                  <option value="">Chọn nguồn gốc</option>
+                  <option value="OC">OC</option>
+                  <option value="Character">Character</option>
+                </select>
+              </div>
+              <div class="form-group" id="neva-inspiration" style="display: none;">
+                <label for="neva-inspiration-text">Neva được lấy ý tưởng từ:</label>
+                <input type="text" id="neva-inspiration-text" placeholder="nhân vật nào trong tác phẩm nào">
+              </div>
+              <div class="form-group">
+                <label for="neva-personality">Tính cách của Neva: <span class="required">*</span>
+                </label>
+                <textarea id="neva-personality" required></textarea>
+              </div>
+              <div class="form-group">
+                <label for="neva-background">Background Neva:</label>
+                <textarea id="neva-background" placeholder="Neva được đăng ký mới sẽ không có phần này."></textarea>
+              </div>
+            </form>
+            <button id="copy-neva-info" class="btn-primary">
+              <i class="fas fa-copy"></i> Copy Thông Tin Neva </button>
+			  <div id="neva-info-success-message"></div><br>
+			  
+            <button id="copy-all-info" class="btn-primary">
+              <i class="fas fa-copy"></i> Copy Tất Cả Thông Tin </button>
+            <div id="character-info-success-message"></div>
+            <p id="image-reminder" style="display: none; color: #ff6600; margin-top: 10px;"> Đừng quên đính kèm ảnh của Operator và Neva khi bạn đăng profile! </p>
+          </div>
+        </div>
+        <div class="section">
+          <h2 class="section-title" aria-controls="stat-builder" aria-expanded="false">
+            <i class="fas fa-chevron-down toggle-icon"></i>2. Xây dựng chỉ số
+          </h2>
+          <div id="stat-builder" class="section-content" style="display: none;">
+            <form id="calculator-form" class="card">
+              <div class="form-group">
+                <label for="total">Base Stat:</label>
+                <input type="number" id="total" name="total" required min="0" aria-label="Base Stat" placeholder="Enter Base Stat">
+              </div>
+              <div id="stat-summary" class="card">
+                <div class="stat-item right-align">
+                  <span>Remaining:</span>
+                  <span id="remaining-total" class="highlight"></span>
+                </div>
+              </div>
+              <div id="stat-inputs">
+                <div class="form-group">
+                  <label for="hp">HP:</label>
+                  <input type="number" id="hp" name="hp" required min="0" aria-label="HP">
+                  <span id="hp-error" class="error-message"></span>
+                </div>
+                <div class="form-group">
+                  <label for="power">Power:</label>
+                  <input type="number" id="power" name="power" min="0" aria-label="Power">
+                  <span id="power-error" class="error-message"></span>
+                </div>
+                <div class="form-group">
+                  <label for="speed">Speed:</label>
+                  <input type="number" id="speed" name="speed" min="0" aria-label="Speed">
+                  <span id="speed-error" class="error-message"></span>
+                </div>
+                <div class="form-group">
+                  <label for="shielding">Shielding (SHD):</label>
+                  <input type="number" id="shielding" name="shielding" min="0" aria-label="Shielding">
+                  <span id="shielding-error" class="error-message"></span>
+                </div>
+                <div class="form-group">
+                  <label for="recovery">Recovery (REC):</label>
+                  <input type="number" id="recovery" name="recovery" min="0" aria-label="Recovery">
+                  <span id="recovery-error" class="error-message"></span>
+                </div>
+                <span id="total-error" class="error-message"></span>
+              </div>
+            </form>
+            <div id="elemental-affinity" class="card">
+              <h2>Element Affinity</h2>
+              <p>Tổng Affinity còn lại: <span id="remaining-affinity">0</span>
+              </p>
+              <div id="affinity-inputs">
+                <div class="affinity-input">
+                  <label for="force-affinity">Force:</label>
+                  <input type="number" id="force-affinity" name="force-affinity" value="1" step="0.1">
+                  <span class="affinity-description" id="force-description"></span>
+                </div>
+                <div class="affinity-input">
+                  <label for="flame-affinity">Flame:</label>
+                  <input type="number" id="flame-affinity" name="flame-affinity" value="1" step="0.1">
+                  <span class="affinity-description" id="flame-description"></span>
+                </div>
+                <div class="affinity-input">
+                  <label for="aqua-affinity">Aqua:</label>
+                  <input type="number" id="aqua-affinity" name="aqua-affinity" value="1" step="0.1">
+                  <span class="affinity-description" id="aqua-description"></span>
+                </div>
+                <div class="affinity-input">
+                  <label for="gale-affinity">Gale:</label>
+                  <input type="number" id="gale-affinity" name="gale-affinity" value="1" step="0.1">
+                  <span class="affinity-description" id="gale-description"></span>
+                </div>
+                <div class="affinity-input">
+                  <label for="terra-affinity">Terra:</label>
+                  <input type="number" id="terra-affinity" name="terra-affinity" value="1" step="0.1">
+                  <span class="affinity-description" id="terra-description"></span>
+                </div>
+                <div class="affinity-input">
+                  <label for="holy-affinity">Holy:</label>
+                  <input type="number" id="holy-affinity" name="holy-affinity" value="1" step="0.1">
+                  <span class="affinity-description" id="holy-description"></span>
+                </div>
+                <div class="affinity-input">
+                  <label for="shadow-affinity">Shadow:</label>
+                  <input type="number" id="shadow-affinity" name="shadow-affinity" value="1" step="0.1">
+                  <span class="affinity-description" id="shadow-description"></span>
+                </div>
+              </div>
+              <span id="affinity-error" class="error-message"></span>
+            </div>
+            <div id="input-values" class="card">
+              <h2>Profile Summary</h2>
+              <p>Base stat: <span id="input-total" class="highlight"></span>
+              </p>
+              <p>HP: <span id="input-hp" class="highlight"></span>
+              </p>
+              <p>Pow: <span id="input-power" class="highlight"></span>
+              </p>
+              <p>Spd: <span id="input-speed" class="highlight"></span>
+              </p>
+              <p>Shd: <span id="input-shielding" class="highlight"></span>
+              </p>
+              <p>Rec: <span id="input-recovery" class="highlight"></span>
+              </p>
+              <p>Phạm vi dùng skill và tấn công tối đa (Range Limit): <span id="input-range-limit" class="highlight"></span> đơn vị </p>
+              <p>Giới hạn healing mỗi turn (Healing Limit): <span id="input-healing-limit" class="highlight"></span> / turn </p>
+              <br>
+              <h3>Elemental Affinity</h3>
+              <div id="affinity-summary"></div>
+            </div>
+            <button id="copy-values" class="btn-primary">
+              <i class="fas fa-copy"></i> Copy Profile </button>
+            <div id="success-message"></div>
+          </div>
+        </div>
+        <div class="section">
+  <h2 class="section-title" aria-controls="skill-builder" aria-expanded="false">
+    <i class="fas fa-chevron-down toggle-icon"></i>3. Xây dựng kỹ năng cho Neva
+  </h2>
+  <div id="skill-builder" class="section-content" style="display: none;">
+    <form id="neva-skill-form">
+      <div class="form-group">
+        <label for="neva-class">Class:</label>
+        <select id="neva-class" required>
+          <option value="">Chọn class</option>
+          <option value="Attacker">Attacker</option>
+          <option value="Tanker">Tanker</option>
+          <option value="Supporter">Supporter</option>
+          <option value="Debuffer">Debuffer</option>
+          <option value="Scouter">Scouter</option>
+          <option value="Speedster">Speedster</option>
+          <option value="Healer">Healer</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label for="normal-attack-element">Hệ đòn đánh thường:</label>
+        <select id="normal-attack-element" required>
+          <option value="">Chọn hệ</option>
+          <option value="Force">Force</option>
+          <option value="Flame">Flame</option>
+          <option value="Aqua">Aqua</option>
+          <option value="Gale">Gale</option>
+          <option value="Terra">Terra</option>
+          <option value="Holy">Holy</option>
+          <option value="Shadow">Shadow</option>
+        </select>
+      </div>
+
+      <div id="second-attack-element-group" class="form-group" style="display: none;">
+        <label for="second-attack-element">Hệ đòn đánh thường thứ 2:</label>
+        <select id="second-attack-element">
+          <option value="">Chọn hệ</option>
+          <option value="Force">Force</option>
+          <option value="Flame">Flame</option>
+          <option value="Aqua">Aqua</option>
+          <option value="Gale">Gale</option>
+          <option value="Terra">Terra</option>
+          <option value="Holy">Holy</option>
+          <option value="Shadow">Shadow</option>
+        </select>
+      </div>
+
+      <div id="skills-container"></div>
+
+      <button type="button" id="add-skill" class="btn-secondary">Thêm Skill</button>
+      <p id="total-skill-cost">Tổng Skill Cost: <span>0</span>/8</p>
+    </form>
+
+    <button id="copy-neva-skills" class="btn-primary">
+      <i class="fas fa-copy"></i> Copy Thông Tin Kỹ Năng Neva
+    </button>
+    <div id="neva-skills-success-message"></div>
+  </div>
+</div>
+      </main>
+      <footer>
+        <p>&copy; 2024 Profile Assist Tool. All rights reserved.</p>
+      </footer>
+    </div>
+    <script src="build.js"></script>
+  </body>
+</html>
