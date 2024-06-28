@@ -130,17 +130,26 @@ textarea:focus {
 
 @media (prefers-color-scheme: dark) {
     :root {
-        --background-color: #2e2a24;
-        --text-color: #e0d8cc;
-        --primary-color: #8c7b6b;
-        --primary-light: #a59484;
-        --primary-dark: #6d5e51;
-        --border-color: #4a443c;
-        --input-background: #3c3631;
+        --background-color: #2e2e2e;
+        --text-color: #e0e0e0;
+        --primary-color: #a59484;
+        --primary-light: #c0b0a0;
+        --primary-dark: #8c7b6b;
+        --border-color: #4a4a4a;
+        --input-background: #3c3c3c;
+    }
+
+    body {
+        background-color: var(--background-color);
     }
 
     .section {
-        background: #3c3631;
+        background: #3c3c3c;
+    }
+
+    .section-title {
+        background-color: var(--primary-color);
+        color: #ffffff;
     }
 
     input[type="text"],
@@ -149,9 +158,18 @@ textarea:focus {
     textarea {
         background-color: var(--input-background);
         color: var(--text-color);
+        border-color: var(--border-color);
     }
 
     #elemental-affinity {
         background-color: var(--input-background);
+    }
+
+    .btn-primary {
+        background-color: var(--primary-color);
+    }
+
+    .btn-primary:hover {
+        background-color: var(--primary-light);
     }
 }
