@@ -8,15 +8,15 @@
 body {
     font-family: 'Roboto', Arial, sans-serif;
     line-height: 1.6;
-    color: #333;
-    background-color: #f0f4f8;
+    color: #333333;
+    background-color: #e0e0e0;
     padding: 20px;
 }
 
 .container {
     max-width: 1200px;
     margin: 0 auto;
-    background: white;
+    background: #f0f0f0;
     padding: 30px;
     border-radius: 12px;
     box-shadow: 0 10px 30px rgba(0,0,0,0.1);
@@ -24,7 +24,7 @@ body {
 
 /* Tiêu đề và phần đầu */
 h1, h2, h3, h4 {
-    color: #2c3e50;
+    color: #2c5282;
     margin-bottom: 20px;
     font-weight: 700;
 }
@@ -37,7 +37,7 @@ h4 { font-size: 1.2em; }
 .back-button {
     display: inline-flex;
     align-items: center;
-    background-color: #3498db;
+    background-color: #2c5282;
     color: white;
     text-decoration: none;
     padding: 10px 20px;
@@ -49,7 +49,7 @@ h4 { font-size: 1.2em; }
 }
 
 .back-button:hover {
-    background-color: #2980b9;
+    background-color: #1a365d;
     transform: translateY(-2px);
     box-shadow: 0 7px 14px rgba(50, 50, 93, 0.1), 0 3px 6px rgba(0, 0, 0, 0.08);
 }
@@ -75,14 +75,14 @@ h4 { font-size: 1.2em; }
 /* Sections */
 .section {
     margin-bottom: 30px;
-    background-color: #fff;
+    background-color: #f5f5f5;
     border-radius: 8px;
     overflow: hidden;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
 
 .section-title {
-    background-color: #3498db;
+    background-color: #2c5282;
     color: white;
     padding: 15px 20px;
     cursor: pointer;
@@ -93,12 +93,12 @@ h4 { font-size: 1.2em; }
 }
 
 .section-title:hover {
-    background-color: #2980b9;
+    background-color: #1a365d;
 }
 
 .section-content {
     padding: 20px;
-    border-top: 1px solid #ecf0f1;
+    border-top: 1px solid #cccccc;
 }
 
 /* Form elements */
@@ -110,7 +110,7 @@ label {
     display: block;
     margin-bottom: 8px;
     font-weight: 600;
-    color: #34495e;
+    color: #2c5282;
 }
 
 input[type="number"],
@@ -118,16 +118,18 @@ input[type="text"],
 select {
     width: 100%;
     padding: 12px;
-    border: 2px solid #bdc3c7;
+    border: 2px solid #cccccc;
     border-radius: 6px;
     font-size: 16px;
     transition: border-color 0.3s ease;
+    background-color: #f5f5f5;
+    color: #333333;
 }
 
 input[type="number"]:focus,
 input[type="text"]:focus,
 select:focus {
-    border-color: #3498db;
+    border-color: #2c5282;
     outline: none;
 }
 
@@ -158,13 +160,13 @@ input[type="checkbox"] {
 
 .input-message {
     font-size: 14px;
-    color: #7f8c8d;
+    color: #4a5568;
     margin-top: 5px;
 }
 
 /* Results */
 .result-box {
-    background-color: #ecf0f1;
+    background-color: #e2e8f0;
     border-radius: 8px;
     padding: 20px;
     margin-top: 20px;
@@ -237,32 +239,9 @@ input[type="checkbox"] {
 
 .section {
     margin-bottom: 20px;
-    border: 1px solid #e0e0e0;
+    border: 1px solid #cccccc;
     border-radius: 8px;
     overflow: hidden;
-}
-
-.section-title {
-    background-color: #3498db;
-    color: white;
-    padding: 15px;
-    cursor: pointer;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    font-weight: bold;
-    transition: background-color 0.3s ease;
-}
-
-.section-content {
-    padding: 15px;
-}
-
-.result-box {
-    margin-top: 15px;
-    padding: 15px;
-    background-color: #f0f0f0;
-    border-radius: 8px;
 }
 
 .form-header {
@@ -273,7 +252,7 @@ input[type="checkbox"] {
 }
 
 .help-button {
-    background-color: #4CAF50;
+    background-color: #2c5282;
     color: white;
     border: none;
     padding: 5px 10px;
@@ -299,7 +278,7 @@ input[type="checkbox"] {
 }
 
 .modal-content {
-    background-color: #fefefe;
+    background-color: #f5f5f5;
     margin: 15% auto;
     padding: 20px;
     border: 1px solid #888;
@@ -308,7 +287,7 @@ input[type="checkbox"] {
 }
 
 .close {
-    color: #aaa;
+    color: #666666;
     float: right;
     font-size: 28px;
     font-weight: bold;
@@ -316,28 +295,7 @@ input[type="checkbox"] {
 
 .close:hover,
 .close:focus {
-    color: black;
+    color: #333333;
     text-decoration: none;
     cursor: pointer;
-}
-
-.form-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 15px;
-}
-
-.help-button {
-    background-color: #4CAF50;
-    color: white;
-    border: none;
-    padding: 5px 10px;
-    text-align: center;
-    text-decoration: none;
-    display: inline-block;
-    font-size: 14px;
-    margin: 4px 2px;
-    cursor: pointer;
-    border-radius: 4px;
 }

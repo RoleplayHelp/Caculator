@@ -83,6 +83,7 @@ function setupStatCalcForm() {
                 <option value="SPD">Speed</option>
                 <option value="SHD">Shielding</option>
                 <option value="REC">Recovery</option>
+				<option value="REF">Reflex</option>
                 <option value="OTHER">Stat khác</option>
             </select>
         </div>
@@ -157,6 +158,7 @@ function setupStatCalcForm() {
                 <option value="SPD">Speed</option>
                 <option value="SHD">Shielding</option>
                 <option value="REC">Recovery</option>
+				<option value="REF">Reflex</option>
                 <option value="OTHER">Stat khác</option>
             </select>
         </div>
@@ -390,6 +392,11 @@ function calculateStats() {
     // Áp dụng extra boost
     boostLimit += extraBoost / 100;
 
+    // Xử lý trường hợp đặc biệt cho Scouter
+    if (playerClass === 'Scouter') {
+        boostLimit = 2 + extraBoost / 100; // Giới hạn boost là 100% (2 lần base stat) + extra boost
+    }
+
     const maxStat = baseStat * boostLimit;
     finalStat = Math.min(finalStat, maxStat);
 
@@ -480,13 +487,13 @@ function setupDamageReceivedForm() {
 }
 
 const CLASS_BOOST_LIMITS = {
-    Attacker: { HP: 1.5, POW: 2, SHD: 1.5, SPD: 1.5, REC: 1.5 },
-    Tanker: { HP: 2, POW: 1.5, SHD: 2, SPD: 1.5, REC: 1.5 },
-    Healer: { HP: 1.5, POW: 1.5, SHD: 1.5, SPD: 1.5, REC: 2 },
-    Debuffer: { HP: 1.5, POW: 1.5, SHD: 1.5, SPD: 1.5, REC: 1.5 },
-    Speedster: { HP: 1.5, POW: 1.5, SHD: 1.5, SPD: 2, REC: 1.5 },
-    Scouter: { HP: 1.5, POW: 1.5, SHD: 1.5, SPD: 1.5, REC: 1.5 },
-    Supporter: { HP: 1.5, POW: 1.5, SHD: 1.5, SPD: 1.5, REC: 1.5 }
+    Attacker: { HP: 1.5, POW: 2, SHD: 1.5, SPD: 1.5, REC: 1.5, REF: 1.5 },
+    Tanker: { HP: 2, POW: 1.5, SHD: 2, SPD: 1.5, REC: 1.5, REF: 1.5 },
+    Healer: { HP: 1.5, POW: 1.5, SHD: 1.5, SPD: 1.5, REC: 2, REF: 1.5 },
+    Debuffer: { HP: 1.5, POW: 1.5, SHD: 1.5, SPD: 1.5, REC: 1.5, REF: 1.5 },
+    Speedster: { HP: 1.5, POW: 1.5, SHD: 1.5, SPD: 2, REC: 1.5, REF: 1.5 },
+    Scouter: { HP: 1.5, POW: 1.5, SHD: 1.5, SPD: 1.5, REC: 1.5, REF: 2 },
+    Supporter: { HP: 1.5, POW: 1.5, SHD: 1.5, SPD: 1.5, REC: 1.5, REF: 1.5 }
 };
 
 function showStatCalcHelp() {

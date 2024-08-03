@@ -1,11 +1,11 @@
 :root {
-    --background-color: #f7f2eb;
-    --text-color: #4a4a4a;
-    --primary-color: #8c7b6b;
-    --primary-light: #a59484;
-    --primary-dark: #6d5e51;
-    --border-color: #e0d8cc;
-    --input-background: #fdfbf7;
+    --background-color: #e0e0e0;
+    --text-color: #333333;
+    --primary-color: #2c5282;
+    --primary-light: #4a69bb;
+    --primary-dark: #1a365d;
+    --border-color: #cccccc;
+    --input-background: #f5f5f5;
 }
 
 body {
@@ -22,7 +22,7 @@ body {
 }
 
 .section {
-    background: #ffffff;
+    background: #f0f0f0;
     margin-bottom: 30px;
     border: 1px solid var(--border-color);
     border-radius: 8px;
@@ -75,7 +75,7 @@ input[type="number"]:focus,
 select:focus,
 textarea:focus {
     border-color: var(--primary-color);
-    box-shadow: 0 0 0 2px rgba(140, 123, 107, 0.2);
+    box-shadow: 0 0 0 2px rgba(44, 82, 130, 0.2);
     outline: none;
 }
 
@@ -128,48 +128,58 @@ textarea:focus {
     color: var(--text-color);
 }
 
-@media (prefers-color-scheme: dark) {
-    :root {
-        --background-color: #2e2e2e;
-        --text-color: #e0e0e0;
-        --primary-color: #a59484;
-        --primary-light: #c0b0a0;
-        --primary-dark: #8c7b6b;
-        --border-color: #4a4a4a;
-        --input-background: #3c3c3c;
-    }
+.form-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+}
 
-    body {
-        background-color: var(--background-color);
-    }
+.help-button {
+    background-color: #2c5282;
+    color: white;
+    border: none;
+    padding: 5px 10px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 14px;
+    margin: 4px 2px;
+    cursor: pointer;
+    border-radius: 4px;
+}
 
-    .section {
-        background: #3c3c3c;
-    }
+.modal {
+    display: block;
+    position: fixed;
+    z-index: 1;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgba(0,0,0,0.4);
+}
 
-    .section-title {
-        background-color: var(--primary-color);
-        color: #ffffff;
-    }
+.modal-content {
+    background-color: #f5f5f5;
+    margin: 15% auto;
+    padding: 20px;
+    border: 1px solid #888;
+    width: 80%;
+    max-width: 600px;
+}
 
-    input[type="text"],
-    input[type="number"],
-    select,
-    textarea {
-        background-color: var(--input-background);
-        color: var(--text-color);
-        border-color: var(--border-color);
-    }
+.close {
+    color: #666666;
+    float: right;
+    font-size: 28px;
+    font-weight: bold;
+}
 
-    #elemental-affinity {
-        background-color: var(--input-background);
-    }
-
-    .btn-primary {
-        background-color: var(--primary-color);
-    }
-
-    .btn-primary:hover {
-        background-color: var(--primary-light);
-    }
+.close:hover,
+.close:focus {
+    color: #333333;
+    text-decoration: none;
+    cursor: pointer;
 }

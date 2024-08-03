@@ -1,5 +1,5 @@
 const STAT_CONSTANTS = Object.freeze({
-    MIN_HP_RATIO: 0.2,
+    MIN_HP_RATIO: 0.1,
     MIN_SPEED_RATIO: 0.05,
     MAX_SPEED_RATIO: 0.6
 });
@@ -34,6 +34,19 @@ function setupToggleSections() {
             toggleSection(sectionId);
         });
     });
+	
+	const statBuilderSection = document.getElementById('stat-builder');
+    if (statBuilderSection) {
+        const headerDiv = document.createElement('div');
+        headerDiv.className = 'form-header';
+        headerDiv.innerHTML = `
+            <h3>Xây dựng chỉ số</h3>
+            <button type="button" id="stat-builder-help" class="help-button">Help</button>
+        `;
+        statBuilderSection.insertBefore(headerDiv, statBuilderSection.firstChild);
+
+        document.getElementById('stat-builder-help').addEventListener('click', showStatBuilderHelp);
+    }
 }
 
 function toggleSection(sectionId) {
@@ -344,7 +357,7 @@ function updateCopyButtonVisibility() {
 
         if (!hasStatErrors && !hasAffinityError && remainingAffinity <= 0) {
             copyButton.style.display = 'block';
-			} else {
+        } else {
             copyButton.style.display = 'none';
         }
     }
@@ -358,7 +371,7 @@ function updateStatInputs() {
     const hpInput = document.getElementById('hp');
     const speedInput = document.getElementById('speed');
 
-    ['hp', 'power', 'speed', 'shielding', 'recovery'].forEach(id => {
+    ['hp', 'power', 'speed', 'shielding', 'recovery', 'reflex'].forEach(id => {
         const input = document.getElementById(id);
         input.value = '';
         input.placeholder = '';
@@ -381,6 +394,7 @@ function updateStatInputs() {
         document.getElementById('power').placeholder = 'Nhập Power cho nhân vật';
         document.getElementById('shielding').placeholder = 'Nhập giá trị ShD cho nhân vật, thường Shielder dùng stat này';
         document.getElementById('recovery').placeholder = 'Nhập giá trị Rec cho nhân vật, thường Healer dùng stat này';
+        document.getElementById('reflex').placeholder = 'Nhập Reflex cho nhân vật (tối thiểu 10)';
     } else {
         statInputs.style.display = 'none';
         statSummary.style.display = 'none';
@@ -401,11 +415,12 @@ function validateStats() {
     const speed = parseFloat(document.getElementById('speed').value) || 0;
     const shielding = parseFloat(document.getElementById('shielding').value) || 0;
     const recovery = parseFloat(document.getElementById('recovery').value) || 0;
+    const reflex = parseFloat(document.getElementById('reflex').value) || 0;
 
     let isValid = true;
     let errorMessage = '';
 
-    ['hp', 'power', 'speed', 'shielding', 'recovery', 'total'].forEach(id => {
+    ['hp', 'power', 'speed', 'shielding', 'recovery', 'reflex', 'total'].forEach(id => {
         displayError(`${id}-error`, '');
     });
 
@@ -424,18 +439,29 @@ function validateStats() {
         isValid = false;
     }
 
-    const totalStats = hp + power + speed + shielding + recovery;
+    if (reflex < 10) {
+        errorMessage = 'Reflex phải tối thiểu là 10.';
+        displayError('reflex-error', errorMessage);
+        isValid = false;
+    }
+
+    // Tính tổng stat bao gồm cả Ref
+    const totalStats = hp + power + speed + shielding + recovery + reflex;
     const remainingStat = total - totalStats;
 
     document.getElementById('remaining-total').textContent = formatNumber(remainingStat);
 
     if (totalStats > total) {
-        errorMessage = `Total stats exceed Base Stat (${formatNumber(totalStats)}/${formatNumber(total)})`;
+        errorMessage = `Tổng chỉ số (bao gồm Ref) vượt quá Base Stat (${formatNumber(totalStats)}/${formatNumber(total)})`;
+        displayError('total-error', errorMessage);
+        isValid = false;
+    } else if (totalStats < total) {
+        errorMessage = `Tổng chỉ số (bao gồm Ref) chưa đủ Base Stat (${formatNumber(totalStats)}/${formatNumber(total)})`;
         displayError('total-error', errorMessage);
         isValid = false;
     }
 
-    updateInputValues(total, hp, power, speed, shielding, recovery);
+    updateInputValues(total, hp, power, speed, shielding, recovery, reflex);
 
     const showSummary = isValid && (remainingStat === 0) && (total > 0);
     document.getElementById('input-values').style.display = showSummary ? 'block' : 'none';
@@ -443,19 +469,27 @@ function validateStats() {
     updateCopyButtonVisibility();
 }
 
-function updateInputValues(total, hp, power, speed, shielding, recovery) {
+function updateInputValues(total, hp, power, speed, shielding, recovery, reflex) {
     const baseHp = hp * 10;
     const rangeLimit = total;
     const healingLimit = baseHp * 0.2;
 
-    document.getElementById('input-total').textContent = formatNumber(total);
-    document.getElementById('input-hp').textContent = `${formatNumber(hp)}*10 = ${formatNumber(baseHp)}`;
-    document.getElementById('input-power').textContent = formatNumber(power);
-    document.getElementById('input-speed').textContent = formatNumber(speed);
-    document.getElementById('input-shielding').textContent = formatNumber(shielding);
-    document.getElementById('input-recovery').textContent = formatNumber(recovery);
-    document.getElementById('input-range-limit').textContent = `${formatNumber(rangeLimit)}`;
-    document.getElementById('input-healing-limit').textContent = `${formatNumber(healingLimit)} HP`;
+    const updateElementText = (id, value) => {
+        const element = document.getElementById(id);
+        if (element) {
+            element.textContent = value;
+        }
+    };
+
+    updateElementText('input-total', formatNumber(total));
+    updateElementText('input-hp', `${formatNumber(hp)}*10 = ${formatNumber(baseHp)}`);
+    updateElementText('input-power', formatNumber(power));
+    updateElementText('input-speed', formatNumber(speed));
+    updateElementText('input-shielding', formatNumber(shielding));
+    updateElementText('input-recovery', formatNumber(recovery));
+    updateElementText('input-reflex', formatNumber(reflex));
+    updateElementText('input-range-limit', `${formatNumber(rangeLimit)}`);
+    updateElementText('input-healing-limit', `${formatNumber(healingLimit)} HP`);
 }
 
 function copyValues() {
@@ -472,60 +506,28 @@ function copyValues() {
     let result = filteredLines.slice(0, affinityIndex).join('\n');
     result += '\n\n' + filteredLines.slice(affinityIndex).join('\n');
 
-    copyToClipboard(result, 'Đã sao chép thông tin chỉ số thành công!');
+    copyToClipboard(result, 'Đã sao chép thông tin chỉ số thành công!', 'success-message');
 }
 
-document.addEventListener('DOMContentLoaded', () => {
-    setupToggleSections();
-    setupCharacterInfo();
-	setupNevaSkillBuilder();
-	setupNevaSkillBuilder()
-
-
-    const totalInput = document.getElementById('total');
-    if (totalInput) {
-        totalInput.addEventListener('input', updateStatInputs);
-        totalInput.placeholder = "Thường giá trị là 200 cho đa số thành viên đăng ký mới.";
-    }
-
-    ['hp', 'power', 'speed', 'shielding', 'recovery'].forEach(id => {
-        const element = document.getElementById(id);
-        if (element) {
-            element.addEventListener('input', validateStats);
-        }
-    });
-
-    const copyValuesButton = document.getElementById('copy-values');
-    if (copyValuesButton) {
-        copyValuesButton.addEventListener('click', copyValues);
-    }
-
-    const statInputs = document.getElementById('stat-inputs');
-    const statSummary = document.getElementById('stat-summary');
-    const inputValues = document.getElementById('input-values');
-    const copyValuesElement = document.getElementById('copy-values');
-
-    if (statInputs) statInputs.style.display = 'none';
-    if (statSummary) statSummary.style.display = 'none';
-    if (inputValues) inputValues.style.display = 'none';
-    if (copyValuesElement) copyValuesElement.style.display = 'none';
-
-    initializeAffinity();
-    elements.forEach(element => {
-        const input = document.getElementById(`${element}-affinity`);
-        if (input) {
-            input.addEventListener('input', () => {
-                updateAffinityDescription(element, parseFloat(input.value) || 0);
-                updateAllAffinities();
-            });
-        }
-    });
-
-    // Mở rộng phần "Xây dựng chỉ số" mặc định
-    //toggleSection('stat-builder');
-});
-
 function setupNevaSkillBuilder() {
+    const skillBuilderSection = document.getElementById('skill-builder');
+    if (skillBuilderSection) {
+        // Tạo header với nút help
+        const headerDiv = document.createElement('div');
+        headerDiv.className = 'form-header';
+        headerDiv.innerHTML = `
+            <h3>Xây dựng kỹ năng cho Neva</h3>
+            <button type="button" id="neva-skills-help" class="help-button">Help</button>
+        `;
+        skillBuilderSection.insertBefore(headerDiv, skillBuilderSection.firstChild);
+
+        // Thêm event listener cho nút help
+        const helpButton = document.getElementById('neva-skills-help');
+        if (helpButton) {
+            helpButton.addEventListener('click', showNevaSkillsHelp);
+        }
+    }
+
     const nevaClassSelect = document.getElementById('neva-class');
     const secondAttackElementGroup = document.getElementById('second-attack-element-group');
     const addSkillButton = document.getElementById('add-skill');
@@ -549,96 +551,96 @@ function setupNevaSkillBuilder() {
 }
 
 function addSkill() {
-  const skillsContainer = document.getElementById('skills-container');
-  const skillIndex = skillsContainer.children.length + 1;
+    const skillsContainer = document.getElementById('skills-container');
+    const skillIndex = skillsContainer.children.length + 1;
 
-  const skillHTML = `
-    <div class="skill-entry" data-skill-index="${skillIndex}">
-      <h4>Skill ${skillIndex}</h4>
-      <div class="form-group">
-        <label for="skill-name-${skillIndex}">Tên skill (không bắt buộc):</label>
-        <input type="text" id="skill-name-${skillIndex}" placeholder="Nhập tên skill">
-      </div>
-      <div class="form-group">
-        <label for="skill-type-${skillIndex}">Dạng skill:</label>
-        <select id="skill-type-${skillIndex}" required onchange="updateSkillFields(${skillIndex})">
-          <option value="">Chọn dạng skill</option>
-          <option value="Active">Active</option>
-          <option value="Buff">Buff</option>
-          <option value="Auto-active">Auto-active</option>
-          <option value="Passive">Passive</option>
-        </select>
-      </div>
-      <div id="skill-extra-fields-${skillIndex}"></div>
-      <div class="form-group skill-cost">
-        <label>Skill Cost:</label>
-        <input type="number" id="skill-cost-t-${skillIndex}" placeholder="T" min="1" required onchange="updateTotalSkillCost()">
-        <input type="number" id="skill-cost-r-${skillIndex}" placeholder="R" min="0" required onchange="updateTotalSkillCost()">
-      </div>
-      <div class="form-group">
-        <label for="skill-description-${skillIndex}">Mô tả skill:</label>
-        <textarea id="skill-description-${skillIndex}" placeholder="Nhập mô tả chi tiết về skill" required></textarea>
-      </div>
-    </div>
-  `;
+    const skillHTML = `
+        <div class="skill-entry" data-skill-index="${skillIndex}">
+            <h4>Skill ${skillIndex}</h4>
+            <div class="form-group">
+                <label for="skill-name-${skillIndex}">Tên skill (không bắt buộc):</label>
+                <input type="text" id="skill-name-${skillIndex}" placeholder="Nhập tên skill">
+            </div>
+            <div class="form-group">
+                <label for="skill-type-${skillIndex}">Dạng skill:</label>
+                <select id="skill-type-${skillIndex}" required onchange="updateSkillFields(${skillIndex})">
+                    <option value="">Chọn dạng skill</option>
+                    <option value="Active">Active</option>
+                    <option value="Buff">Buff</option>
+                    <option value="Auto-active">Auto-active</option>
+                    <option value="Passive">Passive</option>
+                </select>
+            </div>
+            <div id="skill-extra-fields-${skillIndex}"></div>
+            <div class="form-group skill-cost">
+                <label>Skill Cost:</label>
+                <input type="number" id="skill-cost-t-${skillIndex}" placeholder="T" min="1" required onchange="updateTotalSkillCost()">
+                <input type="number" id="skill-cost-r-${skillIndex}" placeholder="R" min="0" required onchange="updateTotalSkillCost()">
+            </div>
+            <div class="form-group">
+                <label for="skill-description-${skillIndex}">Mô tả skill:</label>
+                <textarea id="skill-description-${skillIndex}" placeholder="Nhập mô tả chi tiết về skill" required></textarea>
+            </div>
+        </div>
+    `;
 
-  skillsContainer.insertAdjacentHTML('beforeend', skillHTML);
-  updateTotalSkillCost();
+    skillsContainer.insertAdjacentHTML('beforeend', skillHTML);
+    updateTotalSkillCost();
 }
 
 function updateSkillFields(skillIndex) {
-  const skillType = document.getElementById(`skill-type-${skillIndex}`).value;
-  const extraFieldsContainer = document.getElementById(`skill-extra-fields-${skillIndex}`);
-  
-  let extraFieldsHTML = '';
-  
-  switch(skillType) {
-    case 'Active':
-      extraFieldsHTML = `
-        <div class="form-group">
-          <label for="skill-cooldown-${skillIndex}">Cooldown (turn):</label>
-          <input type="number" id="skill-cooldown-${skillIndex}" required min="0">
-        </div>
-      `;
-      break;
-    case 'Buff':
-    case 'Auto-active':
-      extraFieldsHTML = `
-        <div class="form-group">
-          <label for="skill-duration-${skillIndex}">Max Duration (turn):</label>
-          <input type="number" id="skill-duration-${skillIndex}" required min="0">
-        </div>
-        <div class="form-group">
-          <label for="skill-cooldown-${skillIndex}">Cooldown (turn):</label>
-          <input type="number" id="skill-cooldown-${skillIndex}" required min="0">
-        </div>
-      `;
-      break;
-    default:
-      extraFieldsHTML = '';
-  }
-  
-  extraFieldsContainer.innerHTML = extraFieldsHTML;
+    const skillType = document.getElementById(`skill-type-${skillIndex}`).value;
+    const extraFieldsContainer = document.getElementById(`skill-extra-fields-${skillIndex}`);
+    
+    let extraFieldsHTML = '';
+    
+    switch(skillType) {
+        case 'Active':
+            extraFieldsHTML = `
+                <div class="form-group">
+                    <label for="skill-cooldown-${skillIndex}">Cooldown (turn):</label>
+                    <input type="number" id="skill-cooldown-${skillIndex}" required min="0">
+                </div>
+            `;
+            break;
+        case 'Buff':
+        case 'Auto-active':
+            extraFieldsHTML = `
+                <div class="form-group">
+                    <label for="skill-duration-${skillIndex}">Max Duration (turn):</label>
+                    <input type="number" id="skill-duration-${skillIndex}" required min="0">
+                </div>
+                <div class="form-group">
+                    <label for="skill-cooldown-${skillIndex}">Cooldown (turn):</label>
+                    <input type="number" id="skill-cooldown-${skillIndex}" required min="0">
+                </div>
+            `;
+            break;
+        default:
+            extraFieldsHTML = '';
+    }
+    
+    extraFieldsContainer.innerHTML = extraFieldsHTML;
 }
 
 function updateTotalSkillCost() {
-  let totalCost = 0;
-  const skillEntries = document.querySelectorAll('.skill-entry');
-  
-  skillEntries.forEach(entry => {
-    const tCost = parseInt(entry.querySelector('input[id^="skill-cost-t-"]').value) || 0;
-    const rCost = parseInt(entry.querySelector('input[id^="skill-cost-r-"]').value) || 0;
-    totalCost += tCost + rCost;
-  });
+    let totalCost = 0;
+    const skillEntries = document.querySelectorAll('.skill-entry');
+    
+    skillEntries.forEach(entry => {
+        const tCost = parseInt(entry.querySelector('input[id^="skill-cost-t-"]').value) || 0;
+        const rCost = parseInt(entry.querySelector('input[id^="skill-cost-r-"]').value) || 0;
+        totalCost += tCost + rCost;
+    });
 
-  const totalCostElement = document.querySelector('#total-skill-cost span');
-  totalCostElement.textContent = totalCost;
-  
-  if (totalCost > 8) {
-    totalCostElement.style.color = 'red';
-  } else {
-    totalCostElement.style.color = '';
-  }
+    const totalCostElement = document.querySelector('#total-skill-cost span');
+    totalCostElement.textContent = totalCost;
+    
+    if (totalCost > 8) {
+        totalCostElement.style.color = 'red';
+    } else {
+        totalCostElement.style.color = '';
+    }
 }
 
 function copyNevaSkills() {
@@ -706,16 +708,137 @@ function copyNevaSkills() {
     copyToClipboard(skillsInfo, 'Đã sao chép thông tin kỹ năng Neva thành công!', 'neva-skills-success-message');
 }
 
-function setupNevaSkillBuilder() {
-  const nevaClassSelect = document.getElementById('neva-class');
-  const secondAttackElementGroup = document.getElementById('second-attack-element-group');
-  const addSkillButton = document.getElementById('add-skill');
-  const copyNevaSkillsButton = document.getElementById('copy-neva-skills');
+function showStatBuilderHelp() {
+    const helpContent = `
+        <p><strong style="color: #e74c3c;">Base Stat:</strong><br>
+        <span style="color: #34495e; padding-left: 15px;">Tổng chỉ số cơ bản của nhân vật, thường là 200.</span></p>
 
-  nevaClassSelect.addEventListener('change', function() {
-    secondAttackElementGroup.style.display = this.value === 'Attacker' ? 'block' : 'none';
-  });
+        <p><strong style="color: #2980b9;">HP:</strong><br>
+        <span style="color: #34495e; padding-left: 15px;">Máu của nhân vật, tối thiểu 10% của Base Stat.</span></p>
 
-  addSkillButton.addEventListener('click', addSkill);
-  copyNevaSkillsButton.addEventListener('click', copyNevaSkills);
+        <p><strong style="color: #27ae60;">Power:</strong><br>
+        <span style="color: #34495e; padding-left: 15px;">Sức mạnh tấn công và thể chất của nhân vật.</span></p>
+		<span style="color: #34495e; padding-left: 15px;">1 Pow tương đương Nhân vật có thể nâng dữ liệu nặng 1TB mà không gặp khó khăn gì.</span></p>
+
+        <p><strong style="color: #8e44ad;">Speed:</strong><br>
+        <span style="color: #34495e; padding-left: 15px;">Ảnh hưởng tới tốc độ di chuyển và tốc độ tấn công của nhân vật, nằm trong khoảng 5% đến 60% của Base Stat.</span></p>
+
+        <p><strong style="color: #d35400;">Shielding (SHD):</strong><br>
+        <span style="color: #34495e; padding-left: 15px;">Cho phép nhân vật có khả năng tạo khiên từ xa với độ bền bằng giá trị ShD đăng ký trong phạm vi 50% arg tối đa xung quanh nhân vật. Mỗi turn dùng một lần.</span></p>
+
+        <p><strong style="color: #16a085;">Recovery (REC):</strong><br>
+        <span style="color: #34495e; padding-left: 15px;">Cho phép nhân vật phục hồi HP của 2 đối tượng bất kỳ, giá trị bằng 25% REC. Mỗi turn dùng 1 lần.</span></p>
+
+        <p><strong style="color: #c0392b;">Reflex (Ref):</strong><br>
+        <span style="color: #34495e; padding-left: 15px;">Phản xạ của nhân vật, tối thiểu là 10.</span></p>
+		<span style="color: #34495e; padding-left: 15px;">Nhân vật có thể phản xạ với hành động có Speed thấp hơn 150% Ref đăng ký. </span></p>
+
+        <p><strong style="color: #f39c12;">Elemental Affinity:</strong><br>
+        <span style="color: #34495e; padding-left: 15px;">Mức độ tương tác với các nguyên tố, tổng phải bằng 7.</span></p>
+
+        <p style="background-color: #f1c40f; color: #000000; padding: 10px; border-radius: 5px;">
+        <strong>Lưu ý:</strong> Tổng các chỉ số phải bằng Base Stat.</p>
+    `;
+    showModal('Hướng dẫn xây dựng chỉ số', helpContent);
 }
+
+function showNevaSkillsHelp() {
+    const helpContent = `
+        <p><strong style="color: #e74c3c;">Class:</strong><br>
+        <span style="color: #34495e; padding-left: 15px;">Chọn class của Neva. Class của nhân vật sẽ quyết định tới cách duyệt skill của admin.</span></p><br>
+
+        <p><strong style="color: #2980b9;">Hệ đòn đánh thường:</strong><br>
+        <span style="color: #34495e; padding-left: 15px;">Chọn hệ nguyên tố cho đòn đánh thường.</span></p><br>
+
+        <p><strong style="color: #27ae60;">Hệ đòn đánh thường thứ 2:</strong><br>
+        <span style="color: #34495e; padding-left: 15px;">Chỉ xuất hiện cho Attacker, cho phép chọn hệ thứ hai.</span></p><br>
+
+        <h4 style="color: #8e44ad;">Kỹ năng:</h4>
+        <ul style="color: #34495e; list-style-type: none; padding-left: 0;">
+            <li><strong style="color: #d35400;">📌 Tên skill:</strong> Đặt tên cho kỹ năng (không bắt buộc).</li>
+            <li><strong style="color: #16a085;">🔄 Dạng skill:</strong> Chọn loại kỹ năng (Active, Buff, Auto-active, Passive).</li>
+            <li><strong style="color: #3498db;">⏱️ Cooldown:</strong> Số turn cần để sử dụng lại kỹ năng.</li>
+            <li><strong style="color: #9b59b6;">⏳ Max Duration:</strong> Thời gian tối đa kỹ năng có hiệu lực (nếu áp dụng).</li>
+            <li><strong style="color: #e67e22;">💎 Skill Cost:</strong>
+                <ul style="list-style-type: none; padding-left: 20px;">
+                    <li style="color: #c0392b; font-weight: bold;">Skill Cost cho phép số thập phân như 1.5, 2.3 cost</li>
+                    <li><strong style="color: #f39c12;">T (Tier):</strong> Quyết định độ mạnh và đa dụng của kỹ năng.</li>
+                    <li><strong style="color: #27ae60;">R (Resist):</strong> Quyết định độ bền của kỹ năng, dùng để chống lại các kỹ năng khoá, trigger và kỹ năng khắc chế.</li>
+                </ul>
+            </li>
+            <li><strong style="color: #2c3e50;">📝 Mô tả skill:</strong> Mô tả chi tiết về cách hoạt động của kỹ năng.</li>
+        </ul>
+
+        <p style="background-color: #f1c40f; color: #000000; padding: 10px; border-radius: 5px; font-weight: bold;">
+        <strong>⚠️ Lưu ý:</strong> Tổng Skill Cost (T + R) không được vượt quá 8.</p>
+    `;
+    showModal('Hướng dẫn xây dựng kỹ năng Neva', helpContent);
+}
+
+function showModal(title, content) {
+    const modal = document.createElement('div');
+    modal.className = 'modal';
+    modal.innerHTML = `
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2>${title}</h2>
+            <div class="modal-body">${content}</div>
+        </div>
+    `;
+
+    document.body.appendChild(modal);
+
+    const closeBtn = modal.querySelector('.close');
+    closeBtn.onclick = function() {
+        document.body.removeChild(modal);
+    }
+
+    window.onclick = function(event) {
+        if (event.target == modal) {
+            document.body.removeChild(modal);
+        }
+    }
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+    setupToggleSections();
+    setupCharacterInfo();
+    setupNevaSkillBuilder();
+	
+	initializeAffinity();
+
+    const totalInput = document.getElementById('total');
+    if (totalInput) {
+        totalInput.addEventListener('input', updateStatInputs);
+        totalInput.placeholder = "Thường giá trị là 200 cho đa số thành viên đăng ký mới.";
+    }
+
+    ['hp', 'power', 'speed', 'shielding', 'recovery', 'reflex'].forEach(id => {
+        const element = document.getElementById(id);
+        if (element) {
+            element.addEventListener('input', validateStats);
+        }
+    });
+
+    const copyValuesButton = document.getElementById('copy-values');
+    if (copyValuesButton) {
+        copyValuesButton.addEventListener('click', copyValues);
+    }
+
+    initializeAffinity();
+    elements.forEach(element => {
+        const input = document.getElementById(`${element}-affinity`);
+        if (input) {
+            input.addEventListener('input', () => {
+                updateAffinityDescription(element, parseFloat(input.value) || 0);
+                updateAllAffinities();
+            });
+        }
+    });
+
+    // Ẩn các phần kết quả ban đầu
+    document.getElementById('stat-inputs').style.display = 'none';
+    document.getElementById('stat-summary').style.display = 'none';
+    document.getElementById('input-values').style.display = 'none';
+    document.getElementById('copy-values').style.display = 'none';
+});
