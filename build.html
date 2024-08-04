@@ -166,7 +166,8 @@
                 </div>
 				
 				<div class="form-group">
-					Ref: <input type="number" id="reflex" min="10" placeholder="Nhập Reflex (tối thiểu 10)">
+					<label for="reflex">Reflex (REF):</label>
+					<input type="number" id="reflex" min="10" placeholder="Nhập Reflex (tối thiểu 10)">
 					<span id="reflex-error" class="error-message"></span>
 				</div>
                 <span id="total-error" class="error-message"></span>
@@ -224,6 +225,8 @@
               <p>Pow: <span id="input-power" class="highlight"></span>
               </p>
               <p>Spd: <span id="input-speed" class="highlight"></span>
+              </p>
+			  <p>Ref: <span id="input-reflex" class="highlight"></span>
               </p>
               <p>Shd: <span id="input-shielding" class="highlight"></span>
               </p>
@@ -300,6 +303,10 @@
     <div id="neva-skills-success-message"></div>
   </div>
 </div>
+		<button id="copy-all-profile-info" class="btn-primary">Copy Tất Cả Thông Tin</button>
+
+		<div id="all-info-success-message"></div>
+		
       </main>
       <footer>
         <p>&copy; 2024 Profile Assist Tool. All rights reserved.</p>

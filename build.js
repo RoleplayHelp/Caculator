@@ -1,3 +1,4 @@
+// Constants and Global Variables
 const STAT_CONSTANTS = Object.freeze({
     MIN_HP_RATIO: 0.1,
     MIN_SPEED_RATIO: 0.05,
@@ -5,18 +6,15 @@ const STAT_CONSTANTS = Object.freeze({
 });
 
 const elementColors = {
-    force: '#8A2BE2',  // BlueViolet
-    flame: '#FF4500',  // OrangeRed
-    aqua: '#1E90FF',   // DodgerBlue
-    gale: '#32CD32',   // LimeGreen
-    terra: '#8B4513',  // SaddleBrown
-    holy: '#FFD700',   // Gold
-    shadow: '#4B0082'  // Indigo
+    force: '#8A2BE2', flame: '#FF4500', aqua: '#1E90FF',
+    gale: '#32CD32', terra: '#8B4513', holy: '#FFD700',
+    shadow: '#4B0082'
 };
 
 const elements = ['force', 'flame', 'aqua', 'gale', 'terra', 'holy', 'shadow'];
 let remainingAffinity = 7;
 
+// Utility Functions
 const formatNumber = num => num % 1 === 0 ? num.toString() : num.toFixed(1);
 
 const displayError = (elementId, message) => {
@@ -27,6 +25,7 @@ const displayError = (elementId, message) => {
     }
 };
 
+// Setup Functions
 function setupToggleSections() {
     document.querySelectorAll('.section-title').forEach(title => {
         title.addEventListener('click', function() {
@@ -34,8 +33,8 @@ function setupToggleSections() {
             toggleSection(sectionId);
         });
     });
-	
-	const statBuilderSection = document.getElementById('stat-builder');
+
+    const statBuilderSection = document.getElementById('stat-builder');
     if (statBuilderSection) {
         const headerDiv = document.createElement('div');
         headerDiv.className = 'form-header';
@@ -67,14 +66,42 @@ function setupCharacterInfo() {
         nevaInspiration.style.display = this.value === 'Character' ? 'block' : 'none';
     });
 
-    document.getElementById('copy-operator-info').addEventListener('click', copyOperatorInfo);
-    document.getElementById('copy-neva-info').addEventListener('click', copyNevaInfo);
-    document.getElementById('copy-all-info').addEventListener('click', copyAllInfo);
-
     const nevaIdInput = document.getElementById('neva-id');
     nevaIdInput.addEventListener('input', validateNevaId);
 }
 
+function setupNevaSkillBuilder() {
+    const skillBuilderSection = document.getElementById('skill-builder');
+    if (skillBuilderSection) {
+        const headerDiv = document.createElement('div');
+        headerDiv.className = 'form-header';
+        headerDiv.innerHTML = `
+            <h3>Xây dựng kỹ năng cho Neva</h3>
+            <button type="button" id="neva-skills-help" class="help-button">Help</button>
+        `;
+        skillBuilderSection.insertBefore(headerDiv, skillBuilderSection.firstChild);
+
+        document.getElementById('neva-skills-help').addEventListener('click', showNevaSkillsHelp);
+    }
+
+    const nevaClassSelect = document.getElementById('neva-class');
+    const secondAttackElementGroup = document.getElementById('second-attack-element-group');
+
+    if (nevaClassSelect) {
+        nevaClassSelect.addEventListener('change', function() {
+            if (secondAttackElementGroup) {
+                secondAttackElementGroup.style.display = this.value === 'Attacker' ? 'block' : 'none';
+            }
+        });
+    }
+
+    const addSkillButton = document.getElementById('add-skill');
+    if (addSkillButton) {
+        addSkillButton.addEventListener('click', addSkill);
+    }
+}
+
+// Validation Functions
 function validateNevaId() {
     const nevaIdInput = document.getElementById('neva-id');
     const nevaIdError = document.getElementById('neva-id-error');
@@ -115,28 +142,33 @@ function validateRequiredFields(formId) {
     return isValid;
 }
 
+function validateStats() {
+    const total = parseFloat(document.getElementById('total').value) || 0;
+    const hp = parseFloat(document.getElementById('hp').value) || 0;
+    const power = parseFloat(document.getElementById('power').value) || 0;
+    const speed = parseFloat(document.getElementById('speed').value) || 0;
+    const shielding = parseFloat(document.getElementById('shielding').value) || 0;
+    const recovery = parseFloat(document.getElementById('recovery').value) || 0;
+    const reflex = parseFloat(document.getElementById('reflex').value) || 0;
+
+    let isValid = true;
+
+    if (hp < total * STAT_CONSTANTS.MIN_HP_RATIO) isValid = false;
+    if (speed < total * STAT_CONSTANTS.MIN_SPEED_RATIO || speed > total * STAT_CONSTANTS.MAX_SPEED_RATIO) isValid = false;
+    if (reflex < 10) isValid = false;
+    if (hp + power + speed + shielding + recovery + reflex !== total) isValid = false;
+
+    return isValid;
+}
+
+// Copy Functions
 function copyOperatorInfo() {
     if (!validateRequiredFields('operator-form')) {
         alert('Vui lòng điền đầy đủ thông tin bắt buộc cho Operator');
         return;
     }
 
-    let info = "";
-    
-    const operatorName = document.getElementById('operator-name').value;
-    const operatorAge = document.getElementById('operator-age').value;
-    const operatorGender = document.getElementById('operator-gender').value;
-    const operatorBackground = document.getElementById('operator-background').value;
-    const operatorPersonality = document.getElementById('operator-personality').value;
-    const operatorAdditionalInfo = document.getElementById('operator-additional-info').value;
-
-    if (operatorName) info += `Tên Operator: ${operatorName}\n`;
-    if (operatorAge) info += `Tuổi: ${operatorAge}\n`;
-    if (operatorGender) info += `Giới tính Operator: ${operatorGender}\n`;
-    if (operatorBackground) info += `Background Operator: ${operatorBackground}\n`;
-    if (operatorPersonality) info += `Tính cách Operator: ${operatorPersonality}\n`;
-    if (operatorAdditionalInfo) info += `Thông tin thêm: ${operatorAdditionalInfo}\n`;
-
+    let info = getOperatorInfo();
     copyToClipboard(info, 'Đã sao chép thông tin Operator thành công!', 'operator-info-success-message');
 }
 
@@ -146,89 +178,36 @@ function copyNevaInfo() {
         return;
     }
 
-    let info = "";
-
-    const nevaId = document.getElementById('neva-id').value;
-    const nevaName = document.getElementById('neva-name').value;
-    const nevaGender = document.getElementById('neva-gender').value;
-    const nevaOrigin = document.getElementById('neva-origin').value;
-    const nevaInspiration = document.getElementById('neva-inspiration-text').value;
-    const nevaPersonality = document.getElementById('neva-personality').value;
-    const nevaBackground = document.getElementById('neva-background').value;
-
-    if (nevaId) info += `ID Neva: ${nevaId}\n`;
-    if (nevaName) info += `Tên Neva: ${nevaName}\n`;
-    if (nevaGender) info += `Giới tính Neva: ${nevaGender}\n`;
-    if (nevaOrigin) {
-        info += `Nguồn gốc thiết kế: ${nevaOrigin}\n`;
-        if (nevaOrigin === 'Character' && nevaInspiration) {
-            info += `Lấy ý tưởng từ: ${nevaInspiration}\n`;
-        }
-    }
-    if (nevaPersonality) info += `Tính cách Neva: ${nevaPersonality}\n`;
-    if (nevaBackground) info += `Background Neva: ${nevaBackground}\n`;
-
+    let info = getNevaInfo();
     copyToClipboard(info, 'Đã sao chép thông tin Neva thành công!', 'neva-info-success-message');
 }
 
-function copyAllInfo() {
-    const isOperatorValid = validateRequiredFields('operator-form');
-    const isNevaValid = validateRequiredFields('neva-form');
+function copyAllProfileInfo() {
+    let allInfo = "";
+    let validSections = 0;
 
-    if (!isOperatorValid && !isNevaValid) {
-        alert('Vui lòng điền đầy đủ thông tin bắt buộc cho cả Operator và Neva');
-        return;
-    } else if (!isOperatorValid) {
-        alert('Vui lòng điền đầy đủ thông tin bắt buộc cho Operator');
-        return;
-    } else if (!isNevaValid) {
-        alert('Vui lòng điền đầy đủ thông tin bắt buộc cho Neva');
-        return;
+    if (isOperatorInfoValid()) {
+        allInfo += getOperatorInfo() + "\n\n";
+        validSections++;
+    }
+    if (isNevaInfoValid()) {
+        allInfo += getNevaInfo() + "\n\n";
+        validSections++;
+    }
+    if (isStatsValid()) {
+        allInfo += getStatsInfo() + "\n\n";
+        validSections++;
+    }
+    if (isNevaSkillsValid()) {
+        allInfo += getNevaSkillsInfo();
+        validSections++;
     }
 
-    let info = "";
-    
-    // Operator info
-    const operatorName = document.getElementById('operator-name').value;
-    const operatorAge = document.getElementById('operator-age').value;
-    const operatorGender = document.getElementById('operator-gender').value;
-    const operatorBackground = document.getElementById('operator-background').value;
-    const operatorPersonality = document.getElementById('operator-personality').value;
-    const operatorAdditionalInfo = document.getElementById('operator-additional-info').value;
-
-    info += "Thông tin Operator:\n";
-    if (operatorName) info += `Tên Operator: ${operatorName}\n`;
-    if (operatorAge) info += `Tuổi: ${operatorAge}\n`;
-    if (operatorGender) info += `Giới tính Operator: ${operatorGender}\n`;
-    if (operatorBackground) info += `Background Operator: ${operatorBackground}\n`;
-    if (operatorPersonality) info += `Tính cách Operator: ${operatorPersonality}\n`;
-    if (operatorAdditionalInfo) info += `Thông tin thêm: ${operatorAdditionalInfo}\n`;
-
-    info += '\n';
-
-    // Neva info
-    const nevaId = document.getElementById('neva-id').value;
-    const nevaName = document.getElementById('neva-name').value;
-    const nevaGender = document.getElementById('neva-gender').value;
-    const nevaOrigin = document.getElementById('neva-origin').value;
-    const nevaInspiration = document.getElementById('neva-inspiration-text').value;
-    const nevaPersonality = document.getElementById('neva-personality').value;
-    const nevaBackground = document.getElementById('neva-background').value;
-
-    info += "Thông tin Neva:\n";
-    if (nevaId) info += `ID Neva: ${nevaId}\n`;
-    if (nevaName) info += `Tên Neva: ${nevaName}\n`;
-    if (nevaGender) info += `Giới tính Neva: ${nevaGender}\n`;
-    if (nevaOrigin) {
-        info += `Nguồn gốc thiết kế: ${nevaOrigin}\n`;
-        if (nevaOrigin === 'Character' && nevaInspiration) {
-            info += `Lấy ý tưởng từ: ${nevaInspiration}\n`;
-        }
+    if (validSections > 0) {
+        copyToClipboard(allInfo.trim(), `Đã sao chép ${validSections} phần thông tin hợp lệ thành công!`, 'all-info-success-message');
+    } else {
+        alert('Không có thông tin hợp lệ để copy.');
     }
-    if (nevaPersonality) info += `Tính cách Neva: ${nevaPersonality}\n`;
-    if (nevaBackground) info += `Background Neva: ${nevaBackground}\n`;
-
-    copyToClipboard(info, 'Đã sao chép tất cả thông tin thành công!', 'all-info-success-message');
 }
 
 function copyToClipboard(text, successMessage, elementId) {
@@ -242,25 +221,126 @@ function copyToClipboard(text, successMessage, elementId) {
                 messageContainer.innerHTML = '';
                 messageContainer.appendChild(successElement);
             }
-
-            // Hiển thị nhắc nhở về ảnh
-            const imageReminder = document.getElementById('image-reminder');
-            if (imageReminder) {
-                imageReminder.style.display = 'block';
-            }
-
+            alert(successMessage);
             setTimeout(() => {
                 if (successElement.parentNode) {
                     successElement.parentNode.removeChild(successElement);
                 }
-                if (imageReminder) {
-                    imageReminder.style.display = 'none';
-                }
             }, 5000);
         })
-        .catch(err => console.error('Failed to copy text: ', err));
+        .catch(err => {
+            console.error('Failed to copy text: ', err);
+            alert('Có lỗi xảy ra khi sao chép thông tin. Vui lòng thử lại.');
+        });
 }
 
+// Get Info Functions
+function getOperatorInfo() {
+    let info = "Thông tin Operator:\n";
+    const fields = ['name', 'age', 'gender', 'background', 'personality', 'additional-info'];
+    const labels = ['Tên Operator', 'Tuổi', 'Giới tính Operator', 'Background Operator', 'Tính cách Operator', 'Thông tin thêm'];
+    
+    fields.forEach((field, index) => {
+        const value = document.getElementById(`operator-${field}`).value;
+        if (value) info += `${labels[index]}: ${value}\n`;
+    });
+    
+    return info;
+}
+
+function getNevaInfo() {
+    let info = "Thông tin Neva:\n";
+    const fields = ['id', 'name', 'gender', 'origin', 'inspiration-text', 'personality', 'background'];
+    const labels = ['ID Neva', 'Tên Neva', 'Giới tính Neva', 'Nguồn gốc thiết kế', 'Lấy ý tưởng từ', 'Tính cách Neva', 'Background Neva'];
+    
+    fields.forEach((field, index) => {
+        const value = document.getElementById(`neva-${field}`).value;
+        if (value) {
+            if (field === 'origin') {
+                info += `${labels[index]}: ${value}\n`;
+                if (value === 'Character') {
+                    const inspiration = document.getElementById('neva-inspiration-text').value;
+                    if (inspiration) info += `Lấy ý tưởng từ: ${inspiration}\n`;
+                }
+            } else if (field !== 'inspiration-text') {
+                info += `${labels[index]}: ${value}\n`;
+            }
+        }
+    });
+    
+    return info;
+}
+
+function getStatsInfo() {
+    const total = document.getElementById('total').value;
+    const hp = document.getElementById('hp').value;
+    const power = document.getElementById('power').value;
+    const speed = document.getElementById('speed').value;
+    const shielding = document.getElementById('shielding').value;
+    const recovery = document.getElementById('recovery').value;
+    const reflex = document.getElementById('reflex').value;
+
+    let info = "Thông tin chỉ số:\n";
+    info += `Base stat: ${total}\n`;
+    info += `HP: ${hp}*10 = ${hp * 10}\n`;
+    info += `Pow: ${power}\n`;
+    info += `Spd: ${speed}\n`;
+    info += `Shd: ${shielding}\n`;
+    info += `Rec: ${recovery}\n`;
+    info += `Ref: ${reflex}\n`;
+    info += `Phạm vi dùng skill và tấn công tối đa (Range Limit): ${total} arg\n`;
+    info += `Giới hạn healing mỗi turn (Healing Limit): ${hp * 10 * 0.2} HP / turn\n\n`;
+
+    info += "Elemental Affinity:\n";
+    elements.forEach(element => {
+        const value = document.getElementById(`${element}-affinity`).value;
+        info += `${element.charAt(0).toUpperCase() + element.slice(1)} Affinity: ${value}\n`;
+    });
+
+    return info;
+}
+
+function getNevaSkillsInfo() {
+    const nevaClass = document.getElementById('neva-class').value;
+    const normalAttackElement = document.getElementById('normal-attack-element').value;
+    const secondAttackElement = document.getElementById('second-attack-element').value;
+
+    let info = "Thông tin kỹ năng Neva:\n";
+    info += `Class: ${nevaClass}\n`;
+    info += `Hệ đòn đánh thường: ${normalAttackElement}\n`;
+    if (nevaClass === 'Attacker' && secondAttackElement) {
+        info += `Hệ đòn đánh thường thứ 2: ${secondAttackElement}\n`;
+    }
+
+    const skillEntries = document.querySelectorAll('.skill-entry');
+    skillEntries.forEach((entry, index) => {
+        const skillName = entry.querySelector(`#skill-name-${index + 1}`).value || '';
+        const skillType = entry.querySelector(`#skill-type-${index + 1}`).value;
+        const skillCostT = entry.querySelector(`#skill-cost-t-${index + 1}`).value;
+        const skillCostR = entry.querySelector(`#skill-cost-r-${index + 1}`).value;
+        const skillDescription = entry.querySelector(`#skill-description-${index + 1}`).value;
+
+        info += `\nSkill ${index + 1}${skillName ? ` - ${skillName}` : ''}:\n`;
+        info += `Dạng: ${skillType}\n`;
+        
+        if (skillType === 'Active') {
+            const cooldown = entry.querySelector(`#skill-cooldown-${index + 1}`).value;
+            info += `Cooldown: ${cooldown} turn\n`;
+        } else if (skillType === 'Buff' || skillType === 'Auto-active') {
+            const duration = entry.querySelector(`#skill-duration-${index + 1}`).value;
+            const cooldown = entry.querySelector(`#skill-cooldown-${index + 1}`).value;
+            info += `Max Duration: ${duration} turn\n`;
+            info += `Cooldown: ${cooldown} turn\n`;
+        }
+        
+        info += `Cost: T${skillCostT}R${skillCostR}\n`;
+        info += `Mô tả: ${skillDescription}\n`;
+    });
+
+    return info;
+}
+
+// Affinity Functions
 function initializeAffinity() {
     elements.forEach(element => {
         const input = document.getElementById(`${element}-affinity`);
@@ -346,23 +426,7 @@ function updateAffinitySummary() {
     }
 }
 
-function updateCopyButtonVisibility() {
-    const copyButton = document.getElementById('copy-values');
-    if (copyButton) {
-        const statErrors = document.querySelectorAll('#calculator-form .error-message');
-        const affinityError = document.getElementById('affinity-error');
-        
-        const hasStatErrors = Array.from(statErrors).some(error => error.style.display !== 'none');
-        const hasAffinityError = affinityError && affinityError.style.display !== 'none';
-
-        if (!hasStatErrors && !hasAffinityError && remainingAffinity <= 0) {
-            copyButton.style.display = 'block';
-        } else {
-            copyButton.style.display = 'none';
-        }
-    }
-}
-
+// Stat Functions
 function updateStatInputs() {
     const total = parseFloat(document.getElementById('total').value) || 0;
     const statInputs = document.getElementById('stat-inputs');
@@ -383,6 +447,7 @@ function updateStatInputs() {
         statInputs.style.display = 'block';
         statSummary.style.display = 'flex';
         remainingTotal.textContent = formatNumber(total);
+        updateRemaining();
 
         const requiredHp = formatNumber(total * STAT_CONSTANTS.MIN_HP_RATIO);
         hpInput.placeholder = `Yêu cầu HP thấp nhất = ${requiredHp}`;
@@ -408,148 +473,37 @@ function updateStatInputs() {
     updateCopyButtonVisibility();
 }
 
-function validateStats() {
+function updateRemaining() {
     const total = parseFloat(document.getElementById('total').value) || 0;
-    const hp = parseFloat(document.getElementById('hp').value) || 0;
-    const power = parseFloat(document.getElementById('power').value) || 0;
-    const speed = parseFloat(document.getElementById('speed').value) || 0;
-    const shielding = parseFloat(document.getElementById('shielding').value) || 0;
-    const recovery = parseFloat(document.getElementById('recovery').value) || 0;
-    const reflex = parseFloat(document.getElementById('reflex').value) || 0;
-
-    let isValid = true;
-    let errorMessage = '';
-
-    ['hp', 'power', 'speed', 'shielding', 'recovery', 'reflex', 'total'].forEach(id => {
-        displayError(`${id}-error`, '');
+    let used = 0;
+    ['hp', 'power', 'speed', 'shielding', 'recovery', 'reflex'].forEach(id => {
+        used += parseFloat(document.getElementById(id).value) || 0;
     });
-
-    const requiredHp = total * STAT_CONSTANTS.MIN_HP_RATIO;
-    if (hp < requiredHp) {
-        errorMessage = `Yêu cầu HP tối thiểu là ${formatNumber(requiredHp)}.`;
-        displayError('hp-error', errorMessage);
-        isValid = false;
+    const remaining = total - used;
+    const remainingTotal = document.getElementById('remaining-total');
+    if (remainingTotal) {
+        remainingTotal.textContent = formatNumber(remaining);
     }
-
-    const minSpeed = total * STAT_CONSTANTS.MIN_SPEED_RATIO;
-    const maxSpeed = total * STAT_CONSTANTS.MAX_SPEED_RATIO;
-    if (speed < minSpeed || speed > maxSpeed) {
-        errorMessage = `Speed phải nằm trong khoảng ${formatNumber(minSpeed)} and ${formatNumber(maxSpeed)}.`;
-        displayError('speed-error', errorMessage);
-        isValid = false;
-    }
-
-    if (reflex < 10) {
-        errorMessage = 'Reflex phải tối thiểu là 10.';
-        displayError('reflex-error', errorMessage);
-        isValid = false;
-    }
-
-    // Tính tổng stat bao gồm cả Ref
-    const totalStats = hp + power + speed + shielding + recovery + reflex;
-    const remainingStat = total - totalStats;
-
-    document.getElementById('remaining-total').textContent = formatNumber(remainingStat);
-
-    if (totalStats > total) {
-        errorMessage = `Tổng chỉ số (bao gồm Ref) vượt quá Base Stat (${formatNumber(totalStats)}/${formatNumber(total)})`;
-        displayError('total-error', errorMessage);
-        isValid = false;
-    } else if (totalStats < total) {
-        errorMessage = `Tổng chỉ số (bao gồm Ref) chưa đủ Base Stat (${formatNumber(totalStats)}/${formatNumber(total)})`;
-        displayError('total-error', errorMessage);
-        isValid = false;
-    }
-
-    updateInputValues(total, hp, power, speed, shielding, recovery, reflex);
-
-    const showSummary = isValid && (remainingStat === 0) && (total > 0);
-    document.getElementById('input-values').style.display = showSummary ? 'block' : 'none';
-    
-    updateCopyButtonVisibility();
 }
 
-function updateInputValues(total, hp, power, speed, shielding, recovery, reflex) {
-    const baseHp = hp * 10;
-    const rangeLimit = total;
-    const healingLimit = baseHp * 0.2;
+function updateCopyButtonVisibility() {
+    const copyButton = document.getElementById('copy-values');
+    if (copyButton) {
+        const statErrors = document.querySelectorAll('#calculator-form .error-message');
+        const affinityError = document.getElementById('affinity-error');
+        
+        const hasStatErrors = Array.from(statErrors).some(error => error.style.display !== 'none');
+        const hasAffinityError = affinityError && affinityError.style.display !== 'none';
 
-    const updateElementText = (id, value) => {
-        const element = document.getElementById(id);
-        if (element) {
-            element.textContent = value;
-        }
-    };
-
-    updateElementText('input-total', formatNumber(total));
-    updateElementText('input-hp', `${formatNumber(hp)}*10 = ${formatNumber(baseHp)}`);
-    updateElementText('input-power', formatNumber(power));
-    updateElementText('input-speed', formatNumber(speed));
-    updateElementText('input-shielding', formatNumber(shielding));
-    updateElementText('input-recovery', formatNumber(recovery));
-    updateElementText('input-reflex', formatNumber(reflex));
-    updateElementText('input-range-limit', `${formatNumber(rangeLimit)}`);
-    updateElementText('input-healing-limit', `${formatNumber(healingLimit)} HP`);
-}
-
-function copyValues() {
-    const inputValues = document.getElementById('input-values');
-    const allLines = inputValues.innerText.split('\n');
-    
-    // Loại bỏ dòng trống và dòng chỉ chứa khoảng trắng
-    const filteredLines = allLines.filter(line => line.trim() !== '');
-    
-    // Tìm vị trí của "Elemental Affinity"
-    const affinityIndex = filteredLines.findIndex(line => line.includes('Elemental Affinity'));
-    
-    // Tạo chuỗi kết quả với một dòng trống giữa stats và affinity
-    let result = filteredLines.slice(0, affinityIndex).join('\n');
-    result += '\n\n' + filteredLines.slice(affinityIndex).join('\n');
-
-    copyToClipboard(result, 'Đã sao chép thông tin chỉ số thành công!', 'success-message');
-}
-
-function setupNevaSkillBuilder() {
-    const skillBuilderSection = document.getElementById('skill-builder');
-    if (skillBuilderSection) {
-        // Tạo header với nút help
-        const headerDiv = document.createElement('div');
-        headerDiv.className = 'form-header';
-        headerDiv.innerHTML = `
-            <h3>Xây dựng kỹ năng cho Neva</h3>
-            <button type="button" id="neva-skills-help" class="help-button">Help</button>
-        `;
-        skillBuilderSection.insertBefore(headerDiv, skillBuilderSection.firstChild);
-
-        // Thêm event listener cho nút help
-        const helpButton = document.getElementById('neva-skills-help');
-        if (helpButton) {
-            helpButton.addEventListener('click', showNevaSkillsHelp);
+        if (!hasStatErrors && !hasAffinityError && remainingAffinity <= 0) {
+            copyButton.style.display = 'block';
+        } else {
+            copyButton.style.display = 'none';
         }
     }
-
-    const nevaClassSelect = document.getElementById('neva-class');
-    const secondAttackElementGroup = document.getElementById('second-attack-element-group');
-    const addSkillButton = document.getElementById('add-skill');
-    const copyNevaSkillsButton = document.getElementById('copy-neva-skills');
-
-    if (nevaClassSelect) {
-        nevaClassSelect.addEventListener('change', function() {
-            if (secondAttackElementGroup) {
-                secondAttackElementGroup.style.display = this.value === 'Attacker' ? 'block' : 'none';
-            }
-        });
-    }
-
-    if (addSkillButton) {
-        addSkillButton.addEventListener('click', addSkill);
-    }
-
-    if (copyNevaSkillsButton) {
-        copyNevaSkillsButton.addEventListener('click', copyNevaSkills);
-    }
 }
 
+// Neva Skill Functions
 function addSkill() {
     const skillsContainer = document.getElementById('skills-container');
     const skillIndex = skillsContainer.children.length + 1;
@@ -628,19 +582,245 @@ function updateTotalSkillCost() {
     const skillEntries = document.querySelectorAll('.skill-entry');
     
     skillEntries.forEach(entry => {
-        const tCost = parseInt(entry.querySelector('input[id^="skill-cost-t-"]').value) || 0;
-        const rCost = parseInt(entry.querySelector('input[id^="skill-cost-r-"]').value) || 0;
+        const tCost = parseFloat(entry.querySelector('input[id^="skill-cost-t-"]').value) || 0;
+        const rCost = parseFloat(entry.querySelector('input[id^="skill-cost-r-"]').value) || 0;
         totalCost += tCost + rCost;
     });
 
     const totalCostElement = document.querySelector('#total-skill-cost span');
-    totalCostElement.textContent = totalCost;
-    
-    if (totalCost > 8) {
-        totalCostElement.style.color = 'red';
-    } else {
-        totalCostElement.style.color = '';
+    if (totalCostElement) {
+        totalCostElement.textContent = totalCost.toFixed(1);
+        totalCostElement.style.color = totalCost > 8 ? 'red' : '';
     }
+}
+
+// Help Functions
+function showStatBuilderHelp() {
+    const helpContent = `
+        <p><strong style="color: #e74c3c;">Base Stat:</strong><br>
+        <span style="color: #34495e; padding-left: 15px;">Tổng chỉ số cơ bản của nhân vật, thường là 200.</span></p>
+
+        <p><strong style="color: #2980b9;">HP:</strong><br>
+        <span style="color: #34495e; padding-left: 15px;">Máu của nhân vật, tối thiểu 10% của Base Stat.</span></p>
+
+        <p><strong style="color: #27ae60;">Power:</strong><br>
+        <span style="color: #34495e; padding-left: 15px;">Sức mạnh tấn công và thể chất của nhân vật.</span></p>
+        <span style="color: #34495e; padding-left: 15px;">1 Pow tương đương Nhân vật có thể nâng dữ liệu nặng 1TB mà không gặp khó khăn gì.</span></p>
+
+        <p><strong style="color: #8e44ad;">Speed:</strong><br>
+        <span style="color: #34495e; padding-left: 15px;">Ảnh hưởng tới tốc độ di chuyển và tốc độ tấn công của nhân vật, nằm trong khoảng 5% đến 60% của Base Stat.</span></p>
+
+        <p><strong style="color: #d35400;">Shielding (SHD):</strong><br>
+        <span style="color: #34495e; padding-left: 15px;">Cho phép nhân vật có khả năng tạo khiên từ xa với độ bền bằng giá trị ShD đăng ký trong phạm vi 50% arg tối đa xung quanh nhân vật. Mỗi turn dùng một lần.</span></p>
+
+        <p><strong style="color: #16a085;">Recovery (REC):</strong><br>
+        <span style="color: #34495e; padding-left: 15px;">Cho phép nhân vật phục hồi HP của 2 đối tượng bất kỳ, giá trị bằng 25% REC. Mỗi turn dùng 1 lần.</span></p>
+
+        <p><strong style="color: #c0392b;">Reflex (Ref):</strong><br>
+        <span style="color: #34495e; padding-left: 15px;">Phản xạ của nhân vật, tối thiểu là 10.</span></p>
+        <span style="color: #34495e; padding-left: 15px;">Nhân vật có thể phản xạ với hành động có Speed thấp hơn 150% Ref đăng ký. </span></p>
+
+        <p><strong style="color: #f39c12;">Elemental Affinity:</strong><br>
+        <span style="color: #34495e; padding-left: 15px;">Mức độ tương tác với các nguyên tố, tổng phải bằng 7.</span></p>
+        <span style="color: #34495e; padding-left: 15px;">Giá trị affinity của 1 nguyên tố càng to, nhân vật càng yếu với nguyên tố đó.</span></p>
+
+        <p style="background-color: #f1c40f; color: #000000; padding: 10px; border-radius: 5px;">
+        <strong>Lưu ý:</strong> Tổng các chỉ số phải bằng Base Stat.</p>
+    `;
+    showModal('Hướng dẫn xây dựng chỉ số', helpContent);
+}
+
+function showNevaSkillsHelp() {
+    const helpContent = `
+        <p><strong style="color: #e74c3c;">Class:</strong><br>
+        <span style="color: #34495e; padding-left: 15px;">Chọn class của Neva. Class của nhân vật sẽ quyết định tới cách duyệt skill của admin.</span></p><br>
+
+        <p><strong style="color: #2980b9;">Hệ đòn đánh thường:</strong><br>
+        <span style="color: #34495e; padding-left: 15px;">Chọn hệ nguyên tố cho đòn đánh thường.</span></p><br>
+
+        <p><strong style="color: #27ae60;">Hệ đòn đánh thường thứ 2:</strong><br>
+        <span style="color: #34495e; padding-left: 15px;">Chỉ xuất hiện cho Attacker, cho phép chọn hệ thứ hai.</span></p><br>
+
+        <h4 style="color: #8e44ad;">Kỹ năng:</h4>
+        <ul style="color: #34495e; list-style-type: none; padding-left: 0;">
+            <li><strong style="color: #d35400;">📌 Tên skill:</strong> Đặt tên cho kỹ năng (không bắt buộc).</li>
+            <li><strong style="color: #16a085;">🔄 Dạng skill:</strong> Chọn loại kỹ năng (Active, Buff, Auto-active, Passive).</li>
+            <li><strong style="color: #3498db;">⏱️ Cooldown:</strong> Số turn cần để sử dụng lại kỹ năng.</li>
+            <li><strong style="color: #9b59b6;">⏳ Max Duration:</strong> Thời gian tối đa kỹ năng có hiệu lực (nếu áp dụng).</li>
+            <li><strong style="color: #e67e22;">💎 Skill Cost:</strong>
+                <ul style="list-style-type: none; padding-left: 20px;">
+                    <li style="color: #c0392b; font-weight: bold;">Skill Cost cho phép số thập phân như 1.5, 2.3 cost</li>
+                    <li><strong style="color: #f39c12;">T (Tier):</strong> Quyết định độ mạnh và đa dụng của kỹ năng.</li>
+                    <li><strong style="color: #27ae60;">R (Resist):</strong> Quyết định độ bền của kỹ năng, dùng để chống lại các kỹ năng khoá, trigger và kỹ năng khắc chế.</li>
+                </ul>
+            </li>
+            <li><strong style="color: #2c3e50;">📝 Mô tả skill:</strong> Mô tả chi tiết về cách hoạt động của kỹ năng.</li>
+        </ul>
+
+        <p style="background-color: #f1c40f; color: #000000; padding: 10px; border-radius: 5px; font-weight: bold;">
+        <strong>⚠️ Lưu ý:</strong> Tổng Skill Cost (T + R) không được vượt quá 8.</p>
+    `;
+    showModal('Hướng dẫn xây dựng kỹ năng Neva', helpContent);
+}
+
+function showModal(title, content) {
+    const modal = document.createElement('div');
+    modal.className = 'modal';
+    modal.innerHTML = `
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2>${title}</h2>
+            <div class="modal-body">${content}</div>
+        </div>
+    `;
+
+    document.body.appendChild(modal);
+
+    const closeBtn = modal.querySelector('.close');
+    closeBtn.onclick = function() {
+        document.body.removeChild(modal);
+    }
+
+    window.onclick = function(event) {
+        if (event.target == modal) {
+            document.body.removeChild(modal);
+        }
+    }
+}
+
+// Main initialization
+document.addEventListener('DOMContentLoaded', function() {
+    console.log("DOM fully loaded and parsed");
+    setupToggleSections();
+    setupCharacterInfo();
+    setupNevaSkillBuilder();
+    initializeAffinity();
+
+    const totalInput = document.getElementById('total');
+    if (totalInput) {
+        totalInput.addEventListener('input', updateStatInputs);
+        totalInput.placeholder = "Thường giá trị là 200 cho đa số thành viên đăng ký mới.";
+    }
+
+    ['hp', 'power', 'speed', 'shielding', 'recovery', 'reflex'].forEach(id => {
+        const element = document.getElementById(id);
+        if (element) {
+            element.addEventListener('input', function() {
+                validateStats();
+                updateRemaining();
+            });
+        }
+    });
+
+    const copyValuesButton = document.getElementById('copy-values');
+    if (copyValuesButton) {
+        copyValuesButton.addEventListener('click', copyValues);
+    }
+
+    elements.forEach(element => {
+        const input = document.getElementById(`${element}-affinity`);
+        if (input) {
+            input.addEventListener('input', () => {
+                updateAffinityDescription(element, parseFloat(input.value) || 0);
+                updateAllAffinities();
+            });
+        }
+    });
+
+    const copyOperatorInfoButton = document.getElementById('copy-operator-info');
+    if (copyOperatorInfoButton) {
+        copyOperatorInfoButton.addEventListener('click', copyOperatorInfo);
+    }
+
+    const copyNevaInfoButton = document.getElementById('copy-neva-info');
+    if (copyNevaInfoButton) {
+        copyNevaInfoButton.addEventListener('click', copyNevaInfo);
+    }
+
+    const copyNevaSkillsButton = document.getElementById('copy-neva-skills');
+    if (copyNevaSkillsButton) {
+        copyNevaSkillsButton.addEventListener('click', copyNevaSkills);
+    }
+
+    const copyAllInfoButton = document.getElementById('copy-all-profile-info');
+    if (copyAllInfoButton) {
+        copyAllInfoButton.addEventListener('click', copyAllProfileInfo);
+    }
+
+    const copyAllProfileInfoButton = document.getElementById('copy-all-profile-info');
+    if (copyAllProfileInfoButton) {
+        console.log("Found copy-all-profile-info button");
+        copyAllProfileInfoButton.addEventListener('click', function() {
+            console.log("copy-all-profile-info button clicked");
+            copyAllProfileInfo();
+        });
+    } else {
+        console.log("copy-all-profile-info button not found");
+    }
+
+    // Ẩn các phần kết quả ban đầu
+    document.getElementById('stat-inputs').style.display = 'none';
+    document.getElementById('stat-summary').style.display = 'none';
+    document.getElementById('input-values').style.display = 'none';
+    document.getElementById('copy-values').style.display = 'none';
+});
+
+// Additional utility functions
+function isOperatorInfoValid() {
+    return validateRequiredFields('operator-form');
+}
+
+function isNevaInfoValid() {
+    return validateRequiredFields('neva-form');
+}
+
+function isStatsValid() {
+    return validateStats();
+}
+
+function isNevaSkillsValid() {
+    const nevaClass = document.getElementById('neva-class').value;
+    const normalAttackElement = document.getElementById('normal-attack-element').value;
+    
+    if (!nevaClass || !normalAttackElement) {
+        return false;
+    }
+
+    const skillEntries = document.querySelectorAll('.skill-entry');
+    let totalCost = 0;
+    let isValid = true;
+
+    skillEntries.forEach((entry, index) => {
+        const skillType = entry.querySelector(`#skill-type-${index + 1}`).value;
+        const skillCostT = parseFloat(entry.querySelector(`#skill-cost-t-${index + 1}`).value) || 0;
+        const skillCostR = parseFloat(entry.querySelector(`#skill-cost-r-${index + 1}`).value) || 0;
+        const skillDescription = entry.querySelector(`#skill-description-${index + 1}`).value;
+
+        if (!skillType || !skillDescription || (skillCostT + skillCostR === 0)) {
+            isValid = false;
+        }
+
+        totalCost += skillCostT + skillCostR;
+    });
+
+    return isValid && totalCost <= 8;
+}
+
+function copyValues() {
+    const inputValues = document.getElementById('input-values');
+    const allLines = inputValues.innerText.split('\n');
+    
+    // Loại bỏ dòng trống và dòng chỉ chứa khoảng trắng
+    const filteredLines = allLines.filter(line => line.trim() !== '');
+    
+    // Tìm vị trí của "Elemental Affinity"
+    const affinityIndex = filteredLines.findIndex(line => line.includes('Elemental Affinity'));
+    
+    // Tạo chuỗi kết quả với một dòng trống giữa stats và affinity
+    let result = filteredLines.slice(0, affinityIndex).join('\n');
+    result += '\n\n' + filteredLines.slice(affinityIndex).join('\n');
+
+    copyToClipboard(result, 'Đã sao chép thông tin chỉ số thành công!', 'success-message');
 }
 
 function copyNevaSkills() {
@@ -708,137 +888,39 @@ function copyNevaSkills() {
     copyToClipboard(skillsInfo, 'Đã sao chép thông tin kỹ năng Neva thành công!', 'neva-skills-success-message');
 }
 
-function showStatBuilderHelp() {
-    const helpContent = `
-        <p><strong style="color: #e74c3c;">Base Stat:</strong><br>
-        <span style="color: #34495e; padding-left: 15px;">Tổng chỉ số cơ bản của nhân vật, thường là 200.</span></p>
+function copyAllProfileInfo() {
+    console.log("copyAllProfileInfo function called");
+    let allInfo = "";
+    let validSections = 0;
 
-        <p><strong style="color: #2980b9;">HP:</strong><br>
-        <span style="color: #34495e; padding-left: 15px;">Máu của nhân vật, tối thiểu 10% của Base Stat.</span></p>
-
-        <p><strong style="color: #27ae60;">Power:</strong><br>
-        <span style="color: #34495e; padding-left: 15px;">Sức mạnh tấn công và thể chất của nhân vật.</span></p>
-		<span style="color: #34495e; padding-left: 15px;">1 Pow tương đương Nhân vật có thể nâng dữ liệu nặng 1TB mà không gặp khó khăn gì.</span></p>
-
-        <p><strong style="color: #8e44ad;">Speed:</strong><br>
-        <span style="color: #34495e; padding-left: 15px;">Ảnh hưởng tới tốc độ di chuyển và tốc độ tấn công của nhân vật, nằm trong khoảng 5% đến 60% của Base Stat.</span></p>
-
-        <p><strong style="color: #d35400;">Shielding (SHD):</strong><br>
-        <span style="color: #34495e; padding-left: 15px;">Cho phép nhân vật có khả năng tạo khiên từ xa với độ bền bằng giá trị ShD đăng ký trong phạm vi 50% arg tối đa xung quanh nhân vật. Mỗi turn dùng một lần.</span></p>
-
-        <p><strong style="color: #16a085;">Recovery (REC):</strong><br>
-        <span style="color: #34495e; padding-left: 15px;">Cho phép nhân vật phục hồi HP của 2 đối tượng bất kỳ, giá trị bằng 25% REC. Mỗi turn dùng 1 lần.</span></p>
-
-        <p><strong style="color: #c0392b;">Reflex (Ref):</strong><br>
-        <span style="color: #34495e; padding-left: 15px;">Phản xạ của nhân vật, tối thiểu là 10.</span></p>
-		<span style="color: #34495e; padding-left: 15px;">Nhân vật có thể phản xạ với hành động có Speed thấp hơn 150% Ref đăng ký. </span></p>
-
-        <p><strong style="color: #f39c12;">Elemental Affinity:</strong><br>
-        <span style="color: #34495e; padding-left: 15px;">Mức độ tương tác với các nguyên tố, tổng phải bằng 7.</span></p>
-
-        <p style="background-color: #f1c40f; color: #000000; padding: 10px; border-radius: 5px;">
-        <strong>Lưu ý:</strong> Tổng các chỉ số phải bằng Base Stat.</p>
-    `;
-    showModal('Hướng dẫn xây dựng chỉ số', helpContent);
-}
-
-function showNevaSkillsHelp() {
-    const helpContent = `
-        <p><strong style="color: #e74c3c;">Class:</strong><br>
-        <span style="color: #34495e; padding-left: 15px;">Chọn class của Neva. Class của nhân vật sẽ quyết định tới cách duyệt skill của admin.</span></p><br>
-
-        <p><strong style="color: #2980b9;">Hệ đòn đánh thường:</strong><br>
-        <span style="color: #34495e; padding-left: 15px;">Chọn hệ nguyên tố cho đòn đánh thường.</span></p><br>
-
-        <p><strong style="color: #27ae60;">Hệ đòn đánh thường thứ 2:</strong><br>
-        <span style="color: #34495e; padding-left: 15px;">Chỉ xuất hiện cho Attacker, cho phép chọn hệ thứ hai.</span></p><br>
-
-        <h4 style="color: #8e44ad;">Kỹ năng:</h4>
-        <ul style="color: #34495e; list-style-type: none; padding-left: 0;">
-            <li><strong style="color: #d35400;">📌 Tên skill:</strong> Đặt tên cho kỹ năng (không bắt buộc).</li>
-            <li><strong style="color: #16a085;">🔄 Dạng skill:</strong> Chọn loại kỹ năng (Active, Buff, Auto-active, Passive).</li>
-            <li><strong style="color: #3498db;">⏱️ Cooldown:</strong> Số turn cần để sử dụng lại kỹ năng.</li>
-            <li><strong style="color: #9b59b6;">⏳ Max Duration:</strong> Thời gian tối đa kỹ năng có hiệu lực (nếu áp dụng).</li>
-            <li><strong style="color: #e67e22;">💎 Skill Cost:</strong>
-                <ul style="list-style-type: none; padding-left: 20px;">
-                    <li style="color: #c0392b; font-weight: bold;">Skill Cost cho phép số thập phân như 1.5, 2.3 cost</li>
-                    <li><strong style="color: #f39c12;">T (Tier):</strong> Quyết định độ mạnh và đa dụng của kỹ năng.</li>
-                    <li><strong style="color: #27ae60;">R (Resist):</strong> Quyết định độ bền của kỹ năng, dùng để chống lại các kỹ năng khoá, trigger và kỹ năng khắc chế.</li>
-                </ul>
-            </li>
-            <li><strong style="color: #2c3e50;">📝 Mô tả skill:</strong> Mô tả chi tiết về cách hoạt động của kỹ năng.</li>
-        </ul>
-
-        <p style="background-color: #f1c40f; color: #000000; padding: 10px; border-radius: 5px; font-weight: bold;">
-        <strong>⚠️ Lưu ý:</strong> Tổng Skill Cost (T + R) không được vượt quá 8.</p>
-    `;
-    showModal('Hướng dẫn xây dựng kỹ năng Neva', helpContent);
-}
-
-function showModal(title, content) {
-    const modal = document.createElement('div');
-    modal.className = 'modal';
-    modal.innerHTML = `
-        <div class="modal-content">
-            <span class="close">&times;</span>
-            <h2>${title}</h2>
-            <div class="modal-body">${content}</div>
-        </div>
-    `;
-
-    document.body.appendChild(modal);
-
-    const closeBtn = modal.querySelector('.close');
-    closeBtn.onclick = function() {
-        document.body.removeChild(modal);
+    if (isOperatorInfoValid()) {
+        console.log("Operator info is valid");
+        allInfo += getOperatorInfo() + "\n\n";
+        validSections++;
+    }
+    if (isNevaInfoValid()) {
+        console.log("Neva info is valid");
+        allInfo += getNevaInfo() + "\n\n";
+        validSections++;
+    }
+    if (isStatsValid()) {
+        console.log("Stats are valid");
+        allInfo += getStatsInfo() + "\n\n";
+        validSections++;
+    }
+    if (isNevaSkillsValid()) {
+        console.log("Neva skills are valid");
+        allInfo += getNevaSkillsInfo();
+        validSections++;
     }
 
-    window.onclick = function(event) {
-        if (event.target == modal) {
-            document.body.removeChild(modal);
-        }
+    if (validSections > 0) {
+        console.log(`Copying ${validSections} valid sections of profile info`);
+        copyToClipboard(allInfo.trim(), `Đã sao chép ${validSections} phần thông tin profile hợp lệ thành công!`, 'all-profile-info-success-message');
+    } else {
+        console.log("No valid profile sections to copy");
+        alert('Không có thông tin profile hợp lệ để copy.');
     }
 }
 
-document.addEventListener('DOMContentLoaded', function() {
-    setupToggleSections();
-    setupCharacterInfo();
-    setupNevaSkillBuilder();
-	
-	initializeAffinity();
-
-    const totalInput = document.getElementById('total');
-    if (totalInput) {
-        totalInput.addEventListener('input', updateStatInputs);
-        totalInput.placeholder = "Thường giá trị là 200 cho đa số thành viên đăng ký mới.";
-    }
-
-    ['hp', 'power', 'speed', 'shielding', 'recovery', 'reflex'].forEach(id => {
-        const element = document.getElementById(id);
-        if (element) {
-            element.addEventListener('input', validateStats);
-        }
-    });
-
-    const copyValuesButton = document.getElementById('copy-values');
-    if (copyValuesButton) {
-        copyValuesButton.addEventListener('click', copyValues);
-    }
-
-    initializeAffinity();
-    elements.forEach(element => {
-        const input = document.getElementById(`${element}-affinity`);
-        if (input) {
-            input.addEventListener('input', () => {
-                updateAffinityDescription(element, parseFloat(input.value) || 0);
-                updateAllAffinities();
-            });
-        }
-    });
-
-    // Ẩn các phần kết quả ban đầu
-    document.getElementById('stat-inputs').style.display = 'none';
-    document.getElementById('stat-summary').style.display = 'none';
-    document.getElementById('input-values').style.display = 'none';
-    document.getElementById('copy-values').style.display = 'none';
-});
+console.log("JavaScript file loaded");

@@ -373,3 +373,68 @@ textarea {
 .element-terra { color: #8B4513; }
 .element-holy { color: #FFD700; }
 .element-shadow { color: #4B0082; }
+
+/* CSS cho nút Help nổi bật */
+.rainbow-button {
+    background: linear-gradient(45deg, red, orange, yellow, green, blue, indigo, violet);
+    background-size: 400%;
+    border: 2px solid #fff;
+    color: white;
+    padding: 10px 20px;
+    font-size: 16px;
+    font-weight: bold;
+    border-radius: 10px;
+    cursor: pointer;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+    transition: background-position 1s, box-shadow 0.3s, transform 0.3s;
+}
+
+.rainbow-button:hover {
+    background-position: 200%;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.7);
+    transform: scale(1.1);
+}
+
+.rainbow-button:focus {
+    outline: none;
+    box-shadow: 0 0 15px rgba(0, 0, 0, 0.8);
+}
+
+.form-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.form-header h3 {
+    margin: 0;
+}
+
+.help-button {
+    background: linear-gradient(45deg, #ff00ff, #00ffff);
+    border: none;
+    color: white;
+    padding: 10px 20px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 16px;
+    margin: 4px 2px;
+    cursor: pointer;
+    border-radius: 25px;
+    transition: all 0.3s ease;
+    box-shadow: 0 0 10px rgba(0,0,0,0.2);
+    animation: rainbow 5s linear infinite;
+}
+
+.help-button:hover {
+    transform: scale(1.1);
+    box-shadow: 0 0 20px rgba(0,0,0,0.3);
+}
+
+@keyframes rainbow {
+    0% {background-position: 0% 50%;}
+    50% {background-position: 100% 50%;}
+    100% {background-position: 0% 50%;}
+}
