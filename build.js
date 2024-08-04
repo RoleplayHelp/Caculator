@@ -665,7 +665,7 @@ function showNevaSkillsHelp() {
 
 function showModal(title, content) {
     const modal = document.createElement('div');
-    modal.className = 'modal';
+    modal.className = 'modal show';
     modal.innerHTML = `
         <div class="modal-content">
             <span class="close">&times;</span>

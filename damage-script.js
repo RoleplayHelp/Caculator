@@ -168,31 +168,37 @@ function setupDamageDealtForm() {
 
 function showDamageDealtHelp() {
     const helpContent = `
-        <p><strong style="color: #e74c3c;">Số lượng đòn tấn công:</strong><br>
-        <span style="color: #34495e; padding-left: 15px;">Nhập số lượng đòn tấn công bạn muốn tính toán.</span></p><br>
+        <div style="background: linear-gradient(45deg, #c0392b, #e74c3c); color: white; padding: 20px; border-radius: 10px; margin-bottom: 20px;">
+            <h3 style="text-align: center; margin: 0; color: #ecf0f1;">⚔️ Hướng Dẫn Tính Toán Sát Thương Gây Ra ⚔️</h3>
+        </div>
 
-        <p><strong style="color: #2980b9;">Sát thương (Pow):</strong><br>
-        <span style="color: #34495e; padding-left: 15px;">Nhập chỉ số sát thương cơ bản của đòn tấn công.</span></p><br>
+        <p style="font-size: 18px; color: #2c3e50; text-align: center; margin-bottom: 20px;">
+            <strong>Công cụ này giúp bạn ước tính chính xác sát thương gây ra, tính đến mọi yếu tố tăng sát thương và hiệu ứng đặc biệt!</strong>
+        </p>
 
-        <p><strong style="color: #27ae60;">Số lượng buff sát thương:</strong><br>
-        <span style="color: #34495e; padding-left: 15px;">Nhập số lượng buff tăng sát thương cho đòn tấn công.</span></p><br>
+        <h3 style="color: #d35400; border-bottom: 2px solid #d35400; padding-bottom: 5px;">🗡️ Thông Tin Đòn Tấn Công</h3>
+        <ul style="list-style-type: none; padding-left: 20px; color: #34495e;">
+            <li>🔢 <strong>Số lượng đòn tấn công:</strong> Nhập số lượng đòn tấn công bạn muốn tính.</li>
+            <li>💥 <strong>Sát thương (Pow):</strong> Nhập chỉ số sát thương cơ bản của mỗi đòn tấn công.</li>
+            <li>🆙 <strong>Số lượng buff sát thương:</strong> Nhập số lượng buff tăng sát thương.</li>
+            <li>🔽 <strong>Số lượng debuff giảm sát thương:</strong> Nhập số lượng debuff giảm sát thương.</li>
+            <li>📊 <strong>Giá trị buff/debuff:</strong> Nhập % tăng (buff) hoặc giảm (debuff) sát thương.</li>
+        </ul>
 
-        <p><strong style="color: #8e44ad;">Số lượng debuff giảm sát thương:</strong><br>
-        <span style="color: #34495e; padding-left: 15px;">Nhập số lượng debuff giảm sát thương cho đòn tấn công.</span></p><br>
-		
-		<p><strong style="color: #16a085;">Giá trị buff/debuff:</strong><br>
-        <span style="color: #34495e; padding-left: 15px;">Nhập % tăng (buff) hoặc giảm (debuff) cho sát thương của bạn.</span></p><br>
+        <h3 style="color: #8e44ad; border-bottom: 2px solid #8e44ad; padding-bottom: 5px;">🌟 Hiệu Ứng Đặc Biệt</h3>
+        <ul style="list-style-type: none; padding-left: 20px; color: #34495e;">
+            <li>💯 <strong>True Damage:</strong> Đánh dấu nếu đòn tấn công gây sát thương thật.</li>
+            <li>🎯 <strong>Piercing:</strong> Đánh dấu nếu đòn tấn công có khả năng xuyên giáp.</li>
+        </ul>
 
-        <p><strong style="color: #d35400;">True Damage:</strong><br>
-        <span style="color: #34495e; padding-left: 15px;">Đánh dấu nếu đòn tấn công gây sát thương thật (Bỏ qua hiệu ứng giảm sát thương theo %).</span></p><br>
-
-        <p><strong style="color: #16a085;">Piercing:</strong><br>
-        <span style="color: #34495e; padding-left: 15px;">Đánh dấu nếu đòn tấn công có khả năng xuyên giáp (Bỏ qua hiệu ứng có khả năng chặn một lượng sát thương cố định).</span></p><br>
-
-        <p style="background-color: #f1c40f; color: #000000; padding: 10px; border-radius: 5px;">Hệ thống sẽ tự động tính toán sát thương cuối cùng dựa trên các thông tin bạn nhập, có tính đến các buff, debuff và hiệu ứng đặc biệt.</p>
+        <div style="background-color: #f39c12; color: white; padding: 15px; border-radius: 5px; margin-top: 20px;">
+            <p style="margin: 0; text-align: center; font-weight: bold;">
+                🔍 Kết Quả: Hệ thống sẽ hiển thị sát thương cuối cùng cho mỗi đòn tấn công và tổng sát thương!
+            </p>
+        </div>
     `;
 
-    showModal('Hướng dẫn tính toán sát thương', helpContent);
+    showModal('Hướng Dẫn Tính Sát Thương Gây Ra', helpContent);
 }
 
 function updateStatBuffDebuffInputs(countInput, type) {
@@ -428,33 +434,42 @@ const CLASS_BOOST_LIMITS = {
 
 function showStatCalcHelp() {
     const helpContent = `
-        <p><strong style="color: #e74c3c;">Loại Base stat:</strong><br>
-        <span style="color: #34495e; padding-left: 15px;">Chọn loại chỉ số bạn muốn tính toán (HP, Power, Speed, Shielding, Recovery hoặc các chỉ số khác).</span></p><br>
+        <div style="background: linear-gradient(45deg, #27ae60, #2ecc71); color: white; padding: 20px; border-radius: 10px; margin-bottom: 20px;">
+            <h3 style="text-align: center; margin: 0; color: #ecf0f1;">📊 Hướng Dẫn Tính Toán Stat 📊</h3>
+        </div>
 
-        <p><strong style="color: #2980b9;">Class:</strong><br>
-        <span style="color: #34495e; padding-left: 15px;">Chọn class của nhân vật. Mỗi class có giới hạn boost khác nhau cho từng loại chỉ số.</span></p><br>
+        <p style="font-size: 18px; color: #2c3e50; text-align: center; margin-bottom: 20px;">
+            <strong>Công cụ này giúp bạn tính toán chính xác các chỉ số của nhân vật sau khi áp dụng buff và debuff!</strong>
+        </p>
 
-        <p><strong style="color: #27ae60;">Base Stat:</strong><br>
-        <span style="color: #34495e; padding-left: 15px;">Nhập giá trị chỉ số cơ bản của nhân vật.</span></p><br>
+        <h3 style="color: #16a085; border-bottom: 2px solid #16a085; padding-bottom: 5px;">🔢 Thông Tin Cơ Bản</h3>
+        <ul style="list-style-type: none; padding-left: 20px; color: #34495e;">
+            <li>📊 <strong>Loại Base stat:</strong> Chọn loại chỉ số bạn muốn tính (HP, Power, Speed, ...).</li>
+            <li>👤 <strong>Class:</strong> Chọn class của nhân vật (ảnh hưởng đến giới hạn boost).</li>
+            <li>🔢 <strong>Base Stat:</strong> Nhập giá trị chỉ số cơ bản của nhân vật.</li>
+            <li>🚀 <strong>Tăng giới hạn boost:</strong> Nhập % tăng thêm cho giới hạn boost (tối đa 50%).</li>
+        </ul>
 
-        <p><strong style="color: #8e44ad;">Tăng giới hạn boost:</strong><br>
-        <span style="color: #34495e; padding-left: 15px;">Nhập % tăng thêm cho giới hạn boost (tối đa 50%).</span></p><br>
+        <h3 style="color: #2980b9; border-bottom: 2px solid #2980b9; padding-bottom: 5px;">🔼 Buff và Debuff</h3>
+        <ul style="list-style-type: none; padding-left: 20px; color: #34495e;">
+            <li>🆙 <strong>Số lượng buff:</strong> Nhập số lượng buff ảnh hưởng đến chỉ số.</li>
+            <li>🔽 <strong>Số lượng debuff:</strong> Nhập số lượng debuff ảnh hưởng đến chỉ số.</li>
+            <li>📈 <strong>Giá trị buff/debuff:</strong> Nhập % tăng (buff) hoặc giảm (debuff) cho mỗi hiệu ứng.</li>
+        </ul>
 
-        <p><strong style="color: #d35400;">Số lượng buff/debuff:</strong><br>
-        <span style="color: #34495e; padding-left: 15px;">Nhập số lượng buff hoặc debuff ảnh hưởng đến chỉ số.</span></p><br>
-
-        <p><strong style="color: #16a085;">Giá trị buff/debuff:</strong><br>
-        <span style="color: #34495e; padding-left: 15px;">Nhập % tăng (buff) hoặc giảm (debuff) cho mỗi hiệu ứng.</span></p><br>
-
-        <p style="background-color: #f1c40f; color: #000000; padding: 10px; border-radius: 5px;">Hệ thống sẽ tự động tính toán chỉ số cuối cùng dựa trên các thông tin bạn nhập, có tính đến giới hạn boost của từng class.</p>
+        <div style="background-color: #3498db; color: white; padding: 15px; border-radius: 5px; margin-top: 20px;">
+            <p style="margin: 0; text-align: center; font-weight: bold;">
+                💡 Mẹo: Hệ thống sẽ tự động tính toán chỉ số cuối cùng, có tính đến giới hạn boost của từng class!
+            </p>
+        </div>
     `;
 
-    showModal('Hướng dẫn tính toán chỉ số', helpContent);
+    showModal('Hướng Dẫn Tính Toán Stat', helpContent);
 }
 
 function showModal(title, content) {
     const modal = document.createElement('div');
-    modal.className = 'modal';
+    modal.className = 'modal show';
     modal.innerHTML = `
         <div class="modal-content">
             <span class="close">&times;</span>

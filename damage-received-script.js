@@ -91,44 +91,49 @@ function initDamageReceivedForm() {
 
 function showDamageReceivedHelp() {
     const helpContent = `
-        <h4 style="color: #e74c3c;">Thông tin người tấn công:</h4>
-        <p><strong style="color: #2980b9;">Sát thương người tấn công:</strong><br>
-        <span style="color: #34495e;">- Nhập giá trị sát thương gốc của người tấn công, trước khi áp dụng bất kỳ hiệu ứng nào.</span></p>
+        <div style="background: linear-gradient(45deg, #2c3e50, #34495e); color: white; padding: 20px; border-radius: 10px; margin-bottom: 20px;">
+            <h3 style="text-align: center; margin: 0; color: #ecf0f1;">🛡️ Hướng Dẫn Tính Toán Sát Thương Nhận Vào 🛡️</h3>
+        </div>
 
-        <p><strong style="color: #2980b9;">Hiệu ứng đòn tấn công:</strong><br>
-        <span style="color: #34495e;">
-        - CDD: Sát thương duy trì, có thể bỏ qua một số phòng thủ.<br>
-        - True Damage: Sát thương thật, bỏ qua hiệu ứng giảm sát thương theo tỉ lệ và không chịu giảm sát thương do tương thích nguyên tố (Elemental Affinity).<br>
-        - Piercing Damage: Sát thương xuyên giáp, bỏ qua hiệu ứng chặn sát thương theo lượng cố định.
-        </span></p>
+        <p style="font-size: 18px; color: #2c3e50; text-align: center; margin-bottom: 20px;">
+            <strong>Công cụ này giúp bạn tính toán chính xác sát thương nhận vào, xem xét mọi yếu tố từ người tấn công đến khả năng phòng thủ của bạn!</strong>
+        </p>
 
-        <p><strong style="color: #2980b9;">Hệ của đòn tấn công:</strong><br>
-        <span style="color: #34495e; padding-left: 15px;">Chọn hệ tương ứng của đòn tấn công. Điều này ảnh hưởng đến Elemental Affinity.</span></p><br>
+        <h3 style="color: #c0392b; border-bottom: 2px solid #c0392b; padding-bottom: 5px;">🗡️ Thông Tin Người Tấn Công</h3>
+        <ul style="list-style-type: none; padding-left: 20px; color: #34495e;">
+            <li>🔢 <strong>Sát thương:</strong> Nhập giá trị sát thương gốc của kẻ tấn công.</li>
+            <li>🌟 <strong>Hiệu ứng đặc biệt:</strong>
+                <ul>
+                    <li>🔁 <strong>CDD:</strong> Sát thương duy trì, có thể xuyên qua một số phòng thủ.</li>
+                    <li>💯 <strong>True Damage:</strong> Sát thương thật, bỏ qua mọi giảm thiểu % và Elemental Affinity.</li>
+                    <li>🎯 <strong>Piercing:</strong> Sát thương xuyên giáp, bỏ qua phòng thủ cố định.</li>
+                </ul>
+            </li>
+            <li>🌈 <strong>Hệ tấn công:</strong> Chọn hệ của đòn tấn công (ảnh hưởng tới Elemental Affinity).</li>
+        </ul>
 
-        <h4 style="color: #e74c3c;">Thông tin người nhận sát thương:</h4>
-        <p><strong style="color: #2980b9;">Hiệu ứng phòng thủ:</strong><br>
-        <span style="color: #34495e;">
-        - Negate CDD: Vô hiệu hóa hiệu ứng CDD.<br>
-        - Negate True Damage: Vô hiệu hóa sát thương thật.<br>
-        - Negate Piercing: Vô hiệu hóa sát thương xuyên giáp.
-        </span></p><br>
+        <h3 style="color: #2980b9; border-bottom: 2px solid #2980b9; padding-bottom: 5px;">🛡️ Thông Tin Người Nhận Sát Thương</h3>
+        <ul style="list-style-type: none; padding-left: 20px; color: #34495e;">
+            <li>🚫 <strong>Hiệu ứng phòng thủ:</strong> Chọn các hiệu ứng vô hiệu hóa sát thương đặc biệt.</li>
+            <li>🛑 <strong>Giảm sát thương cố định:</strong>
+                <ul>
+                    <li>⚔️ Số đòn tấn công phản lại</li>
+                    <li>🏰 Số lượng vật cản (khiên, fake HP, địa hình)</li>
+                    <li>🛡️ Chỉ số Def của bạn</li>
+                </ul>
+            </li>
+            <li>📉 <strong>Giảm sát thương theo %:</strong> Nhập số lượng và giá trị % giảm sát thương.</li>
+            <li>🔮 <strong>Elemental Affinity:</strong> Hệ số kháng/yếu với hệ tấn công (< 1: kháng, > 1: yếu, < 0: hấp thụ).</li>
+        </ul>
 
-        <p><strong style="color: #2980b9;">Giảm sát thương nhận vào cố định:</strong><br>
-        <span style="color: #34495e;">
-        - Đòn tấn công của bản thân: Trong trường hợp nhân vật sử dụng đòn tấn công của bản thân để làm suy yếu đòn tấn công của kẻ địch.<br>
-        - Vật cản: Bao gồm độ bền của khiên, fake HP, và địa hình tham gia vào việc đỡ đòn.<br>
-        - Def: Chỉ số phòng thủ cố định của bản thân.
-        </span></p> <br>
-
-        <p><strong style="color: #2980b9;">Giảm sát thương nhận vào theo tỉ lệ:</strong><br>
-        <span style="color: #34495e; padding-left: 15px;">Nhập số lượng và giá trị phần trăm của các hiệu ứng giảm sát thương theo tỉ lệ. Ví dụ: 20% giảm sát thương.</span></p>
-
-        <p><strong style="color: #2980b9;">Elemental Affinity:</strong><br>
-        <span style="color: #34495e; padding-left: 15px;">Hệ số này phản ánh khả năng kháng hoặc yếu điểm của bạn đối với hệ của đòn tấn công. Giá trị dưới 1 là kháng, trên 1 là yếu điểm, âm là hấp thụ.</span></p><br>
-
-        <p style="background-color: #f39c12; color: #ffffff; padding: 10px; border-radius: 5px; font-weight: bold;">Hệ thống sẽ tự động tính toán sát thương cuối cùng nhận vào dựa trên các thông tin bạn nhập, có tính đến tất cả các hiệu ứng tấn công và phòng thủ.</p>
+        <div style="background-color: #e67e22; color: white; padding: 15px; border-radius: 5px; margin-top: 20px;">
+            <p style="margin: 0; text-align: center; font-weight: bold;">
+                ⚠️ Lưu Ý: Hệ thống sẽ tự động tính toán sát thương cuối cùng dựa trên tất cả thông tin bạn cung cấp! ⚠️
+            </p>
+        </div>
     `;
-    showModal('Hướng dẫn tính toán sát thương nhận vào', helpContent);
+
+    showModal('Hướng Dẫn Tính Sát Thương Nhận Vào', helpContent);
 }
 
 function updateElementalAffinityLabel() {
