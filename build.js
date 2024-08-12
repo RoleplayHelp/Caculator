@@ -490,7 +490,7 @@ function showStatBuilderHelp() {
         <span style="color: #34495e; padding-left: 15px;">Ảnh hưởng tới tốc độ di chuyển và tốc độ tấn công của nhân vật, nằm trong khoảng 5% đến 60% của Base Stat.</span></p>
 
         <p><strong style="color: #d35400;">Shielding (SHD):</strong><br>
-        <span style="color: #34495e; padding-left: 15px;">Cho phép nhân vật có khả năng tạo khiên từ xa với độ bền bằng giá trị ShD đăng ký trong phạm vi 50% arg tối đa xung quanh nhân vật. Mỗi turn dùng một lần.</span></p>
+        <span style="color: #34495e; padding-left: 15px;">Cho phép nhân vật có khả năng tạo khiên từ xa với độ bền bằng giá trị ShD đăng ký trong phạm vi 10 Nt tối đa xung quanh nhân vật. Mỗi turn dùng một lần.</span></p>
 
         <p><strong style="color: #16a085;">Recovery (REC):</strong><br>
         <span style="color: #34495e; padding-left: 15px;">Cho phép nhân vật phục hồi HP của 2 đối tượng bất kỳ, giá trị bằng 25% REC. Mỗi turn dùng 1 lần.</span></p>
